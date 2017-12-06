@@ -221,11 +221,33 @@ def radec_cam2pixel(cam, ra_cam, dec_cam, wpix=0.014, proj="1a"):
 
 def radec2pixel(ra, dec, image, cam, proj='1a'):
 
+    import numpy as np
+
     v_global = radec2v_global(ra, dec)
     v_sc = v_global2v_sc(v_global, image)
     v_cam = v_sc2v_cam(v_sc, cam)
     ra_cam, dec_cam = v_cam2radec_cam(v_cam)
     x, y = radec_cam2pixel(cam, ra_cam, dec_cam)
+
+    # cameras are at different orientations, so adjust pixels accordingly
+    if cam == 'py':
+	x2 = y
+	y2 = x
+	y2 = np.abs(1520.-y2)
+	x = x2
+	y = y2
+
+    if cam == 'my':
+	y2 = x
+	x2 = y
+	x2 = np.abs(1520.-x2)
+	x = x2
+	y = y2
+
+    if cam == 'mx':
+	x = np.abs(1520.-x)
+	y = np.abs(1520.-y)
+
     output = {'v_global' : v_global, 
               'v_sc' : v_sc,
               'v_cam' : v_cam,
@@ -240,10 +262,10 @@ if __name__ == "__main__":
     import pandas as pd
 
     df = pd.read_csv("./data/image_database.txt", index_col=[0])
-    ra = [210.956, 210.956]
-    dec = [-60.373, -60.373]
-    image = "px3" 
-    cam = "px"
+    ra = [220.617]
+    dec = [-64.949]
+    image = "mx3" 
+    cam = "mx"
     proj='1a'
     output = radec2pixel(ra, dec, image, cam, proj='1a')
 
