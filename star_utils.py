@@ -89,7 +89,7 @@ def load_hi_res(loc = os.getcwd()+'/data/high_res/',
     img_fits={}
     for img in img_loc:
         idl_data = (fits.open(img))[0].data
-        img_fits[img.rsplit('\\')[1][:-5]] = idl_data
+        img_fits[img.rsplit('\\')[-1][:-5]] = idl_data
     
     #filter out bad images
     for key in list(img_fits.keys()):
