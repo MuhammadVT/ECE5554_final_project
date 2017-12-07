@@ -139,7 +139,6 @@ def centroid_star(image,thresh=None,fwhm=None):
         if fwhm != None:
             daofind = DAOStarFinder(fwhm=fwhm, threshold=thresh*std)
     sources = daofind(image - median)    
-    print(sources)
     x_img = sources[1][:]
     y_img = sources[2][:]
     good=np.argsort(y_img)
