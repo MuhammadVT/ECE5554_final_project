@@ -106,11 +106,13 @@ def gen_stars(cen_coord_loc=os.getcwd() + '/data/img_pixel_coords/',
     for img in img_list:
         data['err_mag_'+img] = np.sqrt(((data[x_img+img]-offset)-(data[x_act+img]-offset))**2 + ((data[y_img+img]-offset)-(data[y_act+img]-offset))**2)
         data['err_r_'+img] = np.sqrt((data[x_img+img]-offset)**2 + (data[y_img+img]-offset)**2)
+        vectors_img = list(zip((data[x_img+img]-offset).tolist(),(data[y_img+img]-offset).tolist()))
+        vectors_err = list(zip(((data[x_img+img]-offset)-(data[x_act+img]-offset)).tolist(),((data[y_img+img]-offset)-(data[y_act+img]-offset)).tolist()))
+        
         for i in range(len(data.index)):
             data.loc[data.index[i],'err_ang_'+img] = angle_between(vectors_img[i],vectors_err[i])*180.0/np.pi
     
-    
     if save_loc != None:
-        data.to_csv(save_stars_loc)
+        data.to_csv(save_loc)
         
     return data
