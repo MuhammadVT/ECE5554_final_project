@@ -29,7 +29,19 @@ def dmap(data,
         save_dmap = file location of where to save distortion map
         
     Example usage:
-        1) Plot dmaps for all images
+        1) Plot dmap for single image
+        
+        from gen_stars import gen_stars
+        data = gen_stars()
+        img = ['mx3']
+        dmap(data,
+             x_act='x_act_',
+             y_act='y_act_',
+             x_img='x_img_',
+             y_img='y_img_',
+             img_list=img)
+    
+        2) Plot dmaps for all images
         
         from gen_stars import gen_stars
         from star_utils import img_list
