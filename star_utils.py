@@ -8,12 +8,15 @@ Created on Wed Dec  6 14:11:50 2017
 import numpy as np
 from glob import glob
 import pandas as pd
+import os
 
 
-
-def load_stars(loc="C:/Users/addiewan/Google Drive/Research/CIPS/final_project/data/image_database.txt"):
+def load_stars(loc=os.getcwd()+'/data/image_database.txt'):
     '''
     Load the star database (pandas df) from a .txt file
+    
+    Example Usage:
+        1) data = load_stars()
     '''
     df = pd.read_csv(loc, index_col=[0])
     return df
@@ -21,6 +24,9 @@ def load_stars(loc="C:/Users/addiewan/Google Drive/Research/CIPS/final_project/d
 def img_list():
     '''
     Return a list of all star images
+    
+    Exmple Usage:
+        1) img_list = img_list()
     '''
     img_list = ['px1',
                 'mx2',
@@ -60,7 +66,7 @@ def img_stars(data,img,col_list=['ra_act','dec_act']):
     
     return img_stars
 
-def load_hi_res(loc = 'C:/Users/addiewan/Google Drive/Research/CIPS/final_project/data/high_res/',
+def load_hi_res(loc = os.getcwd()+'/data/high_res/',
                 filter_bad='yes'):
     '''
     Load all the .fits images from the high resolution datset and create
@@ -72,6 +78,9 @@ def load_hi_res(loc = 'C:/Users/addiewan/Google Drive/Research/CIPS/final_projec
         
     Output:
         img_fits = dict containing all image arrays
+        
+    Example Usage:
+        1) img_fits = load_hi_res()
     '''
     from astropy.io import fits
     
@@ -109,6 +118,12 @@ def centroid_star(image,thresh=None,fwhm=None):
                     x_img: x-coordinates of centroid pixel location
                     y_img: y-coordinates of centroid pixel location
                     sources: table of centroid info
+                    
+    Example Usage:
+        1) Locate all centroids of stars in image 'px3' using default settings
+    
+            img_fits = load_hi_res()
+            centroids = centroid_star(img_fits['px3'])
     '''
 
     from astropy.stats import sigma_clipped_stats
@@ -148,6 +163,13 @@ def compose_rotation(x, y, z):
     output:
         1) rotation matrix
     
+    Example Usage:
+        1)>>>compose_rotation(45,45,90)
+             Out[9]: 
+             array([[-0.23538292, -0.7940579 ,  0.56041675],
+                    [ 0.46963611,  0.41190357,  0.78088244],
+                    [-0.85090352,  0.44699833,  0.27596319]])
+    
     '''
     r_x = np.eye(3,3)
     r_y = np.eye(3,3)
@@ -173,25 +195,33 @@ def compose_rotation(x, y, z):
     return r
 
 def unit_vector(vector):
-    """ Returns the unit vector of the vector.  """
+    ''' 
+    Returns the unit vector of the vector.
+    
+    Example Usage:
+        1) >>>unit_vector([0,23,4])
+            out: array([ 0.        ,  0.98521175,  0.17134117])
+    '''
     return vector / np.linalg.norm(vector)
 
 def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'::
+    '''
+    Returns the angle in radians between vectors 'v1' and 'v2'::
 
-            >>> angle_between((1, 0, 0), (0, 1, 0))
-            1.5707963267948966
-            >>> angle_between((1, 0, 0), (1, 0, 0))
-            0.0
-            >>> angle_between((1, 0, 0), (-1, 0, 0))
-            3.141592653589793
-    """
+    Example Usage:
+        >>> angle_between((1, 0, 0), (0, 1, 0))
+        1.5707963267948966
+        >>> angle_between((1, 0, 0), (1, 0, 0))
+        0.0
+        >>> angle_between((1, 0, 0), (-1, 0, 0))
+        3.141592653589793
+    '''
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
-def load_quats(loc_q_sc = "C:/Users/addiewan/Google Drive/Research/CIPS/final_project/ra_dec_to_pix/q_sc.sav",
-               loc_q_global = "C:/Users/addiewan/Google Drive/Research/CIPS/final_project/ra_dec_to_pix/q_global.sav"):
+def load_quats(loc_q_sc = os.getcwd()+'/data/q_sc.sav',
+               loc_q_global = os.getcwd()+'/data/q_global.sav'):
     '''
     Load all quaternions from a file location
     
@@ -201,6 +231,9 @@ def load_quats(loc_q_sc = "C:/Users/addiewan/Google Drive/Research/CIPS/final_pr
         
     Output:
         quats: dict contatining quaternion objects q_sc an q_global
+        
+    Example Usage:
+        1) quats = load_quats()
     '''
     from pyquaternion import Quaternion
     from scipy.io import readsav
@@ -222,6 +255,9 @@ def load_cam_angles():
     '''
     Return camera angles (in degrees) for each camera and the associated camera key
         ie x_ang[1] returns angle offset in degrees for camera 'mx'
+    
+    Example Usage:
+        1) cam_angles = load_cam_angles()
     '''
     
     x_ang = np.array((0.42999997,-0.13999999,-19.109999,19.499999))
