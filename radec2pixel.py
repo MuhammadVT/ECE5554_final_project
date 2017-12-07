@@ -1,13 +1,13 @@
+# -*- coding: utf-8 -*-
+
 def radec2v_global(ra, dec):
     """ Convert from J2000 RA/DEC coords to global(J2000) vector
-
     Parameters
     ----------
     ra : list of floats 
         Actual J2000 RA coordinate of interest (units=degrees)'
     dec : list of floats
         Actual J2000 DEC coordinate of interest (units=degrees)'
-
     Return
     ------
     v_global: array of floating numbers
@@ -28,30 +28,25 @@ def radec_cam2v_cam(ra_cam, dec_cam):
     """
     Parameters
     ----------
-
     ra_cam : list/array of floats 
 	'fake' RA angle in camera frame (scalar or array of angles)"
     dec_cam : list/array of floats 
 	'fake' DEC angle in camera frame (scalar or array of angles)"
-
     Returns
     -------
     v_cam : array of floating numbers
 	Numpy array
-
     """
     return radec2v_global(ra_cam, dec_cam)
 
 def v_global2v_sc(v_global, image):
     """Convert global coordinate vector to spacecraft coordinate vector
-
     Parameters
     ----------
     v_global : array
         Vector in global (J2000) frame (can be 3-d  vector or array of vectors)'
     image : str
         Pick stellar image, (e.g. 'mx1' or 'my3')" 
-
     Returns
     -------
     v_sc : array
@@ -60,9 +55,12 @@ def v_global2v_sc(v_global, image):
     from scipy.io import readsav
     from pyquaternion import Quaternion
     import numpy as np
+    import os
 
     # Read .sav files
-    q_global = readsav("./data/q_global.sav", python_dict=True)
+    loc = os.getcwd() + '/data/q_global.sav'
+    #loc=r"C:\Users\addiewan\Google Drive\Research\CIPS\final_project\ra_dec_to_pix\q_global.sav"
+    q_global = readsav(loc, python_dict=True)
 
     q_vec = q_global["q_global_"+image]
     q_vec = np.append(q_vec[-1], q_vec[0:-1])
@@ -76,14 +74,12 @@ def v_global2v_sc(v_global, image):
 
 def v_sc2v_cam(v_sc, cam): 
     """ convert vector in spacecraft coordinate system to vector in camera coordinate system
-
     Parameters
     ----------
     v_sc : array 
         Single vector or array of vectors in S/C frame [3,:]
     cam : str
         Camera (e.g., 'px', 'mx' ,'py',or 'my')
-
     Returns
     -------
     v_cam : array
@@ -93,9 +89,11 @@ def v_sc2v_cam(v_sc, cam):
     from scipy.io import readsav
     from pyquaternion import Quaternion
     import numpy as np
+    import os
 
     # Read .sav files
-    q_sc = readsav("./data/q_sc.sav", python_dict=True)
+    loc = os.getcwd() + '/data/q_sc.sav'
+    q_sc = readsav(loc, python_dict=True)
 
     q_vec = q_sc['q_sc_'+cam]
     q_vec = np.append(q_vec[-1], q_vec[0:-1])
@@ -113,12 +111,10 @@ def v_cam2radec_cam(v_cam):
 
     """ convert vector in camera coordinate system to 'fake' ra/dec camera coords
 	using spherical coord conversion:
-
     Parameters
     ----------
     v_cam : array
 	Single vector or array of vectors in camera frame ie [3,:]
-
     Returns
     -------
     ra_cam : array
@@ -141,7 +137,6 @@ def v_cam2radec_cam(v_cam):
 def radec_cam2pixel(cam, ra_cam, dec_cam, wpix=0.014, proj="1a"):
     """ Convert image coordinates (pixel locations) to 'fake' camera RA/DEC 
         using the specified camera model 
-
     Parameters
     ----------
     cam : str
@@ -150,7 +145,6 @@ def radec_cam2pixel(cam, ra_cam, dec_cam, wpix=0.014, proj="1a"):
         'fake' ra angle in camera frame
     dec_cam : array 
         'fake' dec angle in camera frame
-
     Returns
     -------
     x,y : float
@@ -159,40 +153,40 @@ def radec_cam2pixel(cam, ra_cam, dec_cam, wpix=0.014, proj="1a"):
     import numpy as np
 
     if cam == "px":
-	flen = 26.227412
-	if proj == '1a':
-	    flen = 24.716602
-	    print('1a px model')
-	if proj == 'flen_offset':
-	    flen = 24.716602 + flen_offset
-	    print('1a px model flen_offset')
+    	flen = 26.227412
+    	if proj == '1a':
+    	    flen = 24.716602
+    	    print('1a px model')
+    	if proj == 'flen_offset':
+    	    flen = 24.716602 + flen_offset
+    	    print('1a px model flen_offset')
    
     if cam == 'mx':
-	flen = 26.417139
-	if proj == '1a':
-	    flen = 24.878283
-	    print('1a mx model')
-	if proj == 'flen_offset':
-	    flen = 24.878283 + flen_offset
-	    print('1a px model flen_offset')
+    	flen = 26.417139
+    	if proj == '1a':
+    	    flen = 24.878283
+    	    print('1a mx model')
+    	if proj == 'flen_offset':
+    	    flen = 24.878283 + flen_offset
+    	    print('1a px model flen_offset')
 
     if cam == "py":
-	flen = 26.325814
-	if proj == '1a':
-	    flen = 24.800448
-	    print('1a px model')
-	if proj == 'flen_offset':
-	    flen = 24.800448 + flen_offset
-	    print('1a px model flen_offset')
+    	flen = 26.325814
+    	if proj == '1a':
+    	    flen = 24.800448
+    	    print('1a px model')
+    	if proj == 'flen_offset':
+    	    flen = 24.800448 + flen_offset
+    	    print('1a px model flen_offset')
 
     if cam == 'my':
-	flen = 26.447683
-	if proj == '1a':
-	    flen = 24.904327
-	    print('1a mx model')
-	if proj == 'flen_offset':
-	    flen = 24.904327 + flen_offset
-	    print('1a px model flen_offset')
+    	flen = 26.447683
+    	if proj == '1a':
+    	    flen = 24.904327
+    	    print('1a mx model')
+    	if proj == 'flen_offset':
+    	    flen = 24.904327 + flen_offset
+    	    print('1a px model flen_offset')
 	
     theta = np.deg2rad(90 - dec_cam)
     phi = np.deg2rad(ra_cam)
@@ -231,22 +225,22 @@ def radec2pixel(ra, dec, image, cam, proj='1a'):
 
     # cameras are at different orientations, so adjust pixels accordingly
     if cam == 'py':
-	x2 = y
-	y2 = x
-	y2 = np.abs(1520.-y2)
-	x = x2
-	y = y2
+    	x2 = y
+    	y2 = x
+    	y2 = np.abs(1520.-y2)
+    	x = x2
+    	y = y2
 
     if cam == 'my':
-	y2 = x
-	x2 = y
-	x2 = np.abs(1520.-x2)
-	x = x2
-	y = y2
+    	y2 = x
+    	x2 = y
+    	x2 = np.abs(1520.-x2)
+    	x = x2
+    	y = y2
 
     if cam == 'mx':
-	x = np.abs(1520.-x)
-	y = np.abs(1520.-y)
+    	x = np.abs(1520.-x)
+    	y = np.abs(1520.-y)
 
     output = {'v_global' : v_global, 
               'v_sc' : v_sc,
@@ -260,12 +254,12 @@ def radec2pixel(ra, dec, image, cam, proj='1a'):
 if __name__ == "__main__":
 
     import pandas as pd
+    import os
 
-    df = pd.read_csv("./data/image_database.txt", index_col=[0])
-    ra = [220.617]
-    dec = [-64.949]
-    image = "mx3" 
-    cam = "mx"
-    proj='1a'
-    output = radec2pixel(ra, dec, image, cam, proj='1a')
-
+#    df = pd.read_csv(os.getcwd() + "/data/image_database.txt", index_col=[0])
+#    ra = [140.52852876839043]
+#    dec = [-55.01069444444445]
+#    image = "px3" 
+#    cam = "px"
+#    proj='1a'
+#output = radec2pixel(ra, dec, image, cam, proj='1a')
