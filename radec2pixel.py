@@ -269,7 +269,3 @@ if __name__ == "__main__":
     proj='1a'
     output = radec2pixel(ra, dec, image, cam, proj='1a')
 
-
-    "test"
-
-
