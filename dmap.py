@@ -6,6 +6,7 @@ Created on Thu Dec  7 01:47:29 2017
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 
 def dmap(data,
@@ -14,7 +15,7 @@ def dmap(data,
          x_img='x_img_',
          y_img='y_img_',
          img_list=['px3'],
-         save_dmap="C:/Users/addiewan/Google Drive/Research/CIPS/final_project/data/"):
+         save_dmap=os.getcwd()+'/data/'):
     '''
     Generate distortion for the provided columns in the star database
     
