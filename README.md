@@ -1,8 +1,17 @@
 # ECE5554 (Computer Vision) Final Project
 
 <p align="center">
-    Calibration of Satellite Cameras using Star Images 
-    Brett poche, Maimaitirebike (Muhammad Rafiq) Maimaiti
+    <font size="+3">
+    <b>
+        Calibration of Satellite Cameras using Star Images <br>
+    </font>
+    <font size="+2">
+        <br>
+        Brett poche <br>
+        <br> 
+        Maimaitirebike (Muhammad Rafiq) Maimaiti <br>
+    </b>
+    </font>
 </p>
 
 ## Problem Statement
@@ -22,5 +31,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ## Evaluation
 Due to a limited dataset (14 images total, 2-3 per camera) our approach of evaluation is (1) select one image from each camera for testing purposes (2) use the remaining images to create distortion models for each camera (3) quantify the resulting error on the test images. This method will allow us to determine the efficacy of our distortion models.
+
+## Installation
 
 
