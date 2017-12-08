@@ -1,5 +1,9 @@
 # ECE5554 (Computer Vision) Final Project
-Calibration of Satellite Cameras using Star Images 
+
+<p align="center">
+    Calibration of Satellite Cameras using Star Images 
+    Brett poche, Maimaitirebike (Muhammad Rafiq) Maimaiti
+</p>
 
 ## Problem Statement
 Polar Mesospheric Clouds (PMCs) form high up in the atmosphere near the polar mesopause (~82 km) and consist of tiny ice particles with sizes on the order of 100 nm [[1](https://www.sciencedirect.com/science/article/pii/S1364682608002861)]. The Cloud Imaging and Particle Size instrument (CIPS) onboard the Aeronomy of Ice (AIM) satellite has been recording images of PMCs in a polar orbit ever since launch in 2007. The CIPS instrument consist of four separate CCD imagers, and although the CCDs were calibrated prior to launch, science images obtained during orbit contain systematic flat-fielding errors. It is suspected that these errors could be due to unaccounted for distortion in the cameras.
