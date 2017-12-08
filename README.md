@@ -1,4 +1,4 @@
-# ECE5554_final_project
+# ECE5554 (Computer Vision) Final Project
 Calibration of Satellite Cameras using Star Images 
 
 ## Problem Statement
