@@ -16,4 +16,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 **Step 5)** Ultimately we would like to use the resulting discrete “pixel offsets” found in Step 4 for each image and model the distortion in each camera. This final step will result in a camera model matrix that will transform every pixel location for each camera to a revised location that accounts for the distortion found in each camera.
 
+## Evaluation
+Due to a limited dataset (14 images total, 2-3 per camera) our approach of evaluation is (1) select one image from each camera for testing purposes (2) use the remaining images to create distortion models for each camera (3) quantify the resulting error on the test images. This method will allow us to determine the efficacy of our distortion models.
+
 
