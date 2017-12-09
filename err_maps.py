@@ -3,6 +3,8 @@
 Created on Fri Dec  8 20:39:13 2017
 
 @author: addiewan
+surface fitting code adopted from:
+    https://gist.github.com/amroamroamro/1db8d69b4b65e8bc66a6
 """
 
 
@@ -65,6 +67,7 @@ def err_maps(img=['mx3'],
     import numpy as np
     from scipy.interpolate import griddata
     from star_utils import img_stars,load_stars,rebin,trim
+    import scipy.linalg
     
     data = load_stars()
     x_act=[]
@@ -108,6 +111,60 @@ def err_maps(img=['mx3'],
         zz_x = griddata(xy,xdiff,(x,y),method='nearest')
         zz_y = griddata(xy,ydiff,(x,y),method='nearest')
         zz_mag = griddata(xy,mag,(x,y),method='nearest')
+        
+    if fit == 'surface':
+       order = 2
+       data_xdiff = np.array([x_img,y_img,xdiff]).T
+       data_ydiff = np.array([x_img,y_img,ydiff]).T 
+       data_mag = np.array([x_img,y_img,mag]).T 
+       
+       data = data_xdiff/100.0
+       rows=15
+       cols=15
+       x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
+       y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+       X,Y = np.meshgrid(x,y)
+       XX = X.flatten()
+       YY = Y.flatten()
+       # best-fit quadratic curve
+       A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
+       C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+    
+       # evaluate it on a grid
+       zz_x = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
+       zz_x = scipy.misc.imresize(zz_x, (1520,1520))
+       
+       data = data_ydiff/100.0
+       rows=15
+       cols=15
+       x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
+       y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+       X,Y = np.meshgrid(x,y)
+       XX = X.flatten()
+       YY = Y.flatten()
+       # best-fit quadratic curve
+       A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
+       C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+       
+       # evaluate it on a grid
+       zz_y = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
+       zz_y = scipy.misc.imresize(zz_y, (1520,1520))
+       
+       data = data_mag/100.0
+       rows=15
+       cols=15
+       x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
+       y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+       X,Y = np.meshgrid(x,y)
+       XX = X.flatten()
+       YY = Y.flatten()
+       # best-fit quadratic curve
+       A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
+       C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+       
+       # evaluate it on a grid
+       zz_mag = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
+       zz_mag = scipy.misc.imresize(zz_mag, (1520,1520))
         
     if fit == '2d polyfit':
         def polyfit2d(x, y, z, order=order):
@@ -194,7 +251,7 @@ def err_compare(img,err_maps,plot_dmap=False):
             import pandas as pd
             from err_maps import err_maps,err_compare
             err_maps = err_maps(['mx1','mx2'],fit='2d polyfit',order=2)
-            err_compare(['mx3'],err_maps,plot_dmap=True)
+            err_stats = err_compare(['mx3'],err_maps,plot_dmap=True)
     '''
     from star_utils import img_stars,load_stars
     from dmap import dmap
