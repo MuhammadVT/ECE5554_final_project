@@ -47,12 +47,15 @@ def img_list():
 
 def img_stars(data,img,col_list=['ra_act','dec_act']):
     '''
-    Return info on stars for a particular image in the star database
+    Return info on stars for a list of images in the star database
     
     input: image (ie 'px1' or 'mx3')
     
     Example usage:
-        from star_utils import img_stars
+        
+        1) return list of star info for single star
+        from star_utils import img_stars,load_stars
+        data = load_stars()
         img = 'px1'
         col_list = ['ra_act',
                     'dec_act',
@@ -63,6 +66,35 @@ def img_stars(data,img,col_list=['ra_act','dec_act']):
                     'x_img_'+img,
                     'y_img_'+img]
         stars = img_stars(data,img,col_list)
+        
+        2) create list of x_img,y_img,x_act,y_act for multiple images
+        
+        from star_utils import img_stars,load_stars
+        data = load_stars()
+        img = ['px1','px2','px3']
+        x_act=[]
+        y_act=[]
+        x_img=[]
+        y_img=[]
+        for i in range(len(img)):
+            col_list = ['x_act_'+img[i],
+                        'y_act_'+img[i],
+                        'x_img_'+img[i],
+                        'y_img_'+img[i]]
+            df = img_stars(data,img[i],col_list)
+            x_act.append(list(df['x_act_'+img[i]]))
+            y_act.append(list(df['y_act_'+img[i]]))
+            x_img.append(list(df['x_img_'+img[i]]))
+            y_img.append(list(df['y_img_'+img[i]]))
+        x_act = np.array([item for sublist in x_act for item in sublist])
+        y_act = np.array([item for sublist in y_act for item in sublist])
+        x_img = np.array([item for sublist in x_img for item in sublist])
+        y_img = np.array([item for sublist in y_img for item in sublist])
+
+
+                
+            
+    
         
     '''
     
