@@ -32,17 +32,17 @@ def img_list():
         1) img_list = img_list()
     '''
     img_list = ['px1',
-                'mx2',
-                'py4',
-                'py1',
-                'my4',
-                'my3',
-                'px3',
-                'py3',
                 'px2',
+                'px3',
+                'mx1',
+                'mx2',
                 'mx3',
+                'py1',
                 'py2',
-                'mx1']
+                'py3',
+                'py4',
+                'my3',
+                'my4']
     return img_list
 
 def img_stars(data,img,col_list=['ra_act','dec_act']):
