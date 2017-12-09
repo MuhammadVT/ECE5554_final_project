@@ -275,16 +275,81 @@ def load_cam_angles():
     
     return cam_angles
 
-def rebin(a, shape):
-    sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
-    return a.reshape(sh).mean(-1).mean(1)
+def rebin(array, shape):
+    '''
+    Rebin an array
+    Input:
+        array: numpy array
+        shape: shape to rebin array to
+    Output:
+        rebinned array
+        
+    Example Usage:
+        1)  #create a 3x6 array
+            array = np.array([[1, 2, 3, 4, 5, 6],
+                              [1, 3, 1, 3, 1, 3],
+                              [1, 2, 3, 4, 5, 6]])
+            
+            a)  #bin array along columns
+                >>>rebin(array,(3,3))
+                Out: array([[ 1.5,  3.5,  5.5],
+                            [ 2. ,  2. ,  2. ],
+                            [ 1.5,  3.5,  5.5]])
+            
+            b)  #bin array along rows
+                >>>rebin(test,(1,6))
+                Out: array([[ 1.0,  2.333,  2.333,  3.667,  3.667,  5.0]])
+                
+            c)  #bin array along all columns
+                >>>rebin(array,(3,1))
+                Out: array([[ 3.5],
+                            [ 2. ],
+                            [ 3.5]])
+            
+    '''
+    sh = shape[0],array.shape[0]//shape[0],shape[1],array.shape[1]//shape[1]
+    return array.reshape(sh).mean(-1).mean(1)
 
-def trim(a,shape):
-    rows_old=a.shape[0]    
-    cols_old=a.shape[1]
+def trim(array,shape):
+    '''
+    Trim an array to a specified size 
+    Input:
+        array: numpy array
+        shape: shape to trim array to
+    Output:
+        rebinned array
+        
+    Example Usage:
+        1)  #create a 6x6 array
+            array = np.array([[1, 2, 3, 4, 5, 6],
+                              [1, 3, 1, 3, 1, 3],
+                              [1, 2, 3, 4, 5, 6],
+                              [1, 2, 3, 4, 5, 6],
+                              [1, 3, 1, 3, 1, 3],
+                              [1, 2, 3, 4, 5, 6]])
+            
+            a)  #trim to middle 4x4 area of array
+                >>>trim(array,(4,4))
+                Out: array([[3, 1, 3, 1],
+                            [2, 3, 4, 5],
+                            [2, 3, 4, 5],
+                            [3, 1, 3, 1]])
+            
+            b)  #trim to the middle 4x2 area of array
+                >>>trim(array,(4,2))
+                Out: array([[1, 3],
+                            [3, 4],
+                            [3, 4],
+                            [1, 3]])
+    '''
+    rows_old=array.shape[0]    
+    cols_old=array.shape[1]
     rows_new=shape[0]
     cols_new=shape[1]    
-    array = a[int((rows_old-rows_new)/2):-int((rows_old-rows_new)/2),
-              int((cols_old-cols_new)/2):-int((cols_old-cols_new)/2)]
+    array = array[int((rows_old-rows_new)/2):-int((rows_old-rows_new)/2),
+                  int((cols_old-cols_new)/2):-int((cols_old-cols_new)/2)]
     return array
+
+def shrink(data, rows, cols):
+    return data.reshape(rows, int(data.shape[0]/rows), cols, int(data.shape[1]/cols))
             
