@@ -14,7 +14,9 @@ def dmap(data,
          y_act='y_act_',
          x_img='x_img_',
          y_img='y_img_',
+         err_mag='err_mag_',
          img_list=['px3'],
+         title=None,
          save_dmap=None):
     '''
     Generate distortion for the provided columns in the star database
@@ -40,6 +42,7 @@ def dmap(data,
              y_act='y_act_',
              x_img='x_img_',
              y_img='y_img_',
+             err_mag='err_mag_',
              img_list=img)
     
         2) Plot dmaps for all images
@@ -53,6 +56,7 @@ def dmap(data,
              y_act='y_act_',
              x_img='x_img_',
              y_img='y_img_',
+             err_mag='err_mag_',
              img_list=imgs)
     '''
     from matplotlib.colors import Normalize
@@ -72,7 +76,7 @@ def dmap(data,
         v_err_loc_y = (data[y_img+img]-offset).tolist()
         
         #set colors of vectors to represent the relative magnitude of the error
-        v_colors = data['err_mag_'+img].tolist()
+        v_colors = data[err_mag+img].tolist()
         for i in range(len(v_colors)):
             if np.isnan(v_colors[i]) == True:
                 v_colors[i] = 0.0
@@ -84,7 +88,10 @@ def dmap(data,
         
         plt.figure()
         plt.quiver(v_err_loc_x,v_err_loc_y,v_err_x,v_err_y, color=colormap(norm(v_colors)))
-        plt.title('Distortion Map '+img)
+        if title != None:
+            plt.title('Distortion Map '+img+'\n'+title)
+        else:
+            plt.title('Distortion Map '+img)
         plt.colorbar(sm)
         if save_dmap != None:
             plt.savefig(os.getcwd()+'/data/dmap_figures/'+img+'.png')
