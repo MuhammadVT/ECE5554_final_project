@@ -241,7 +241,7 @@ def err_compare(img,err_maps,plot_dmap=False):
         dmap: set to True to plot resulting distortion map
         
     Outputs:
-        err_stats: statistics on error between modeled star pixel locations and
+        err_info: various info/stats on error between modeled star pixel locations and
                    the centroid pixel locations that were 'corrected' by error map
                    
     Example Usage:
@@ -250,8 +250,8 @@ def err_compare(img,err_maps,plot_dmap=False):
             
             import pandas as pd
             from err_maps import err_maps,err_compare
-            err_maps = err_maps(['mx1','mx2'],fit='2d polyfit',order=2)
-            err_stats = err_compare(['mx3'],err_maps,plot_dmap=True)
+            err_map = err_maps(['mx1','mx2'],fit='2d polyfit',order=2)
+            err_info = err_compare(['mx3'],err_map,plot_dmap=True)
     '''
     from star_utils import img_stars,load_stars
     from dmap import dmap
@@ -294,12 +294,19 @@ def err_compare(img,err_maps,plot_dmap=False):
     y_err_new = y_img_new - y_act
     mag_err_new = np.sqrt(x_err_new**2+y_err_new**2)
     
-    err_stats = {'x_err_old':x_err_old,
-                 'y_err_old':y_err_old,
-                 'mag_err_old':mag_err_old,
-                 'x_err_new':x_err_new,
-                 'y_err_new':y_err_new,
-                 'mag_err_new':mag_err_new}
+    err_info = {'x_err_old_'+img[0]:x_err_old,
+                'y_err_old_'+img[0]:y_err_old,
+                'mag_err_old_'+img[0]:mag_err_old,
+                'x_err_new_'+img[0]:x_err_new,
+                'y_err_new_'+img[0]:y_err_new,
+                'mag_err_new':mag_err_new,
+                'x_img_'+img[0]:x_img,
+                'y_img_'+img[0]:y_img,
+                'x_act_'+img[0]:x_act,
+                'y_act_'+img[0]:y_act,
+                'x_img_new_'+img[0]:x_img_new,
+                'y_img_new_'+img[0]:y_img_new
+                }
     
     if plot_dmap == True:
         data_dmap = {'x_img_'+img[0]:x_img,
@@ -329,7 +336,7 @@ def err_compare(img,err_maps,plot_dmap=False):
              title='Distortion Map after error correction',
              img_list=img)
     
-    return err_stats
+    return err_info
     
     
     
