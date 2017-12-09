@@ -310,7 +310,7 @@ def rebin(array, shape):
     sh = shape[0],array.shape[0]//shape[0],shape[1],array.shape[1]//shape[1]
     return array.reshape(sh).mean(-1).mean(1)
 
-def trim(array,shape):
+def trim(array,shape,off_row=0,off_col=0):
     '''
     Trim an array to a specified size 
     Input:
@@ -322,32 +322,44 @@ def trim(array,shape):
     Example Usage:
         1)  #create a 6x6 array
             array = np.array([[1, 2, 3, 4, 5, 6],
-                              [1, 3, 1, 3, 1, 3],
-                              [1, 2, 3, 4, 5, 6],
-                              [1, 2, 3, 4, 5, 6],
-                              [1, 3, 1, 3, 1, 3],
+                              [6, 5, 4, 3, 2, 1],
+                              [8, 9, 1, 2, 3, 4],
+                              [5, 6, 7, 8, 9, 1],
+                              [2, 3, 4, 5, 6, 7],
                               [1, 2, 3, 4, 5, 6]])
             
             a)  #trim to middle 4x4 area of array
                 >>>trim(array,(4,4))
-                Out: array([[3, 1, 3, 1],
-                            [2, 3, 4, 5],
-                            [2, 3, 4, 5],
-                            [3, 1, 3, 1]])
+                Out: array([[5, 4, 3, 2],
+                            [9, 1, 2, 3],
+                            [6, 7, 8, 9],
+                            [3, 4, 5, 6]])
             
             b)  #trim to the middle 4x2 area of array
                 >>>trim(array,(4,2))
-                Out: array([[1, 3],
-                            [3, 4],
-                            [3, 4],
-                            [1, 3]])
+                Out: array([[4, 3],
+                            [1, 2],
+                            [7, 8],
+                            [4, 5]])
+            
+            c)  #trim to the middle 4x2 area of array and offset col by -1
+                >>>trim(array,(4,2),off_col=-1)
+                Out: array([[4, 3],
+                            [1, 2],
+                            [7, 8],
+                            [4, 5]])
+            
+            d)  #trim to the middle 2x2 area of array and offset -1 col, +1 row
+                >>>trim(array,(2,2),off_col=-1,off_row=1)
+                Out: array([[6, 7],
+                            [3, 4]])
     '''
     rows_old=array.shape[0]    
     cols_old=array.shape[1]
     rows_new=shape[0]
     cols_new=shape[1]    
-    array = array[int((rows_old-rows_new)/2):-int((rows_old-rows_new)/2),
-                  int((cols_old-cols_new)/2):-int((cols_old-cols_new)/2)]
+    array = array[int((rows_old-rows_new)/2)+off_row:-int((rows_old-rows_new)/2)+off_row,
+                  int((cols_old-cols_new)/2)+off_col:-int((cols_old-cols_new)/2)+off_col]
     return array
 
 def shrink(data, rows, cols):
