@@ -16,7 +16,10 @@ def load_stars(loc=os.getcwd()+'/data/image_database.txt'):
     Load the star database (pandas df) from a .txt file
     
     Example Usage:
-        1) data = load_stars()
+        1) 
+        
+        from star_utils import load_stars
+        data = load_stars()
     '''
     df = pd.read_csv(loc, index_col=[0])
     return df
@@ -49,6 +52,7 @@ def img_stars(data,img,col_list=['ra_act','dec_act']):
     input: image (ie 'px1' or 'mx3')
     
     Example usage:
+        from star_utils import img_stars
         img = 'px1'
         col_list = ['ra_act',
                     'dec_act',
@@ -270,4 +274,17 @@ def load_cam_angles():
                   'cam_list':cam_list}
     
     return cam_angles
+
+def rebin(a, shape):
+    sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
+    return a.reshape(sh).mean(-1).mean(1)
+
+def trim(a,shape):
+    rows_old=a.shape[0]    
+    cols_old=a.shape[1]
+    rows_new=shape[0]
+    cols_new=shape[1]    
+    array = a[int((rows_old-rows_new)/2):-int((rows_old-rows_new)/2),
+              int((cols_old-cols_new)/2):-int((cols_old-cols_new)/2)]
+    return array
             
