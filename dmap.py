@@ -15,7 +15,7 @@ def dmap(data,
          x_img='x_img_',
          y_img='y_img_',
          img_list=['px3'],
-         save_dmap=os.getcwd()+'/data/'):
+         save_dmap=None):
     '''
     Generate distortion for the provided columns in the star database
     
@@ -86,6 +86,8 @@ def dmap(data,
         plt.quiver(v_err_loc_x,v_err_loc_y,v_err_x,v_err_y, color=colormap(norm(v_colors)))
         plt.title('Distortion Map '+img)
         plt.colorbar(sm)
+        if save_dmap != None:
+            plt.savefig(os.getcwd()+'/data/dmap_figures/'+img+'.png')
         
     return
 
