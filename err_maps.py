@@ -5,13 +5,7 @@ Created on Fri Dec  8 20:39:13 2017
 @author: addiewan
 """
 
-import itertools
-import numpy as np
-from scipy.interpolate import griddata
-from gen_stars import gen_stars
-from star_utils import img_list,img_stars,load_stars,rebin,trim
-data = gen_stars()
-imgs = img_list()
+
 
 def err_maps(img=['mx3'],
                 fit='linear',
@@ -67,6 +61,13 @@ def err_maps(img=['mx3'],
             plt.ylabel('y-pixel coordinates')
             plt.colorbar()
     '''
+    import itertools
+    import numpy as np
+    from scipy.interpolate import griddata
+    from gen_stars import gen_stars
+    from star_utils import img_stars,load_stars,rebin,trim
+    data = gen_stars()
+    
     data = load_stars()
     x_act=[]
     y_act=[]
@@ -173,5 +174,8 @@ def err_maps(img=['mx3'],
               'err_mag_sci':err_mag_sci}
     
     return err_maps
+
+
+    
     
     
