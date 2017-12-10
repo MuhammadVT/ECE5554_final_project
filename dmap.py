@@ -8,7 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-
 def dmap(data,
          x_act='x_act_',
          y_act='y_act_',
@@ -17,7 +16,8 @@ def dmap(data,
          err_mag='err_mag_',
          img_list=['px3'],
          title=None,
-         save_dmap=None):
+         save_dmap=None,
+         show_plot=True):
     '''
     Generate distortion for the provided columns in the star database
     
@@ -85,18 +85,24 @@ def dmap(data,
         colormap = cm.jet
         sm = cm.ScalarMappable(cmap=colormap, norm=norm)
         sm.set_array([])
+        if show_plot == True:
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.quiver(v_err_loc_x,v_err_loc_y,v_err_x,v_err_y, color=colormap(norm(v_colors)))
+            if title != None:
+                plt.title('Distortion Map '+img+'\n'+title)
+            else:
+                plt.title('Distortion Map '+img)
+            plt.colorbar(sm)
+            if save_dmap != None:
+                plt.savefig(os.getcwd()+'/data/dmap_figures/'+img+'.png')
         
-        plt.figure()
-        plt.quiver(v_err_loc_x,v_err_loc_y,v_err_x,v_err_y, color=colormap(norm(v_colors)))
-        if title != None:
-            plt.title('Distortion Map '+img+'\n'+title)
-        else:
-            plt.title('Distortion Map '+img)
-        plt.colorbar(sm)
-        if save_dmap != None:
-            plt.savefig(os.getcwd()+'/data/dmap_figures/'+img+'.png')
-        
-    return
+    return {'v_err_loc_x':v_err_loc_x,
+            'v_err_loc_y':v_err_loc_y,
+            'v_err_x':v_err_x,
+            'v_err_x':v_err_x,
+            'v_colors':v_colors,
+            'norm':norm}
 
 def plot_offsets(data,col1='x_act_px3',col2='x_img_px3,',title=None):
     '''
