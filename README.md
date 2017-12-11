@@ -20,11 +20,15 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ## Error Modeling
 
-## Evaluation
+
+## Model Evaluation
 
 Due to a limited dataset (14 images total, 2-3 per camera) our approach of evaluation is (1) select one image from each camera for testing purposes (2) use the remaining images to create distortion models for each camera (3) quantify the resulting error on the test images. This method will allow us to determine the efficacy of our distortion models.
 
 ## Summary and Conclusions
+
+## References 
+
 
 ## Installation
 The codes in this project are develped in Windows10 and Ubuntu 16.04.3 LTS.
