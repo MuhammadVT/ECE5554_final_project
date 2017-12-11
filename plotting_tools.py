@@ -24,7 +24,7 @@ import pandas as pd
 from time import time
 
 
-def evaluate(results, baseline_error_dict):
+def evaluate(results, baseline_error_dict, params="magnitude"):
     """
     Visualization code to display results of various learners.
 	
@@ -45,6 +45,12 @@ def evaluate(results, baseline_error_dict):
     bar_width = 0.3
     #colors = ['#A00000', '#00A000']
     colors = ['#A00000','#00A0A0','#00A000']
+
+    if params == "magnitude":
+        idx = 0
+    if params == "angle":
+        idx = 1
+
     
     # Super loop to plot six panels of data
     for k, learner in enumerate(results.keys()):
@@ -55,10 +61,10 @@ def evaluate(results, baseline_error_dict):
             for i in np.arange(3):
                 
                 # Creative plot code
-                ax[j/3, j%3].bar(i+k*bar_width, results[learner][i][metric],
+                ax[j/3, j%3].bar(i+k*bar_width, results[learner][i][metric][idx],
                                  width = bar_width, color = colors[k])
                 ax[j/3, j%3].set_xticks([0.45, 1.45, 2.45])
-                ax[j/3, j%3].set_xticklabels(["1%", "10%", "100%"])
+                ax[j/3, j%3].set_xticklabels(["30%", "50%", "100%"])
                 ax[j/3, j%3].set_xlabel("Training Set Size")
                 ax[j/3, j%3].set_xlim((-0.1, 3.0))
     
@@ -98,10 +104,10 @@ def evaluate(results, baseline_error_dict):
 #                     color = 'k', linestyle = 'dashed')
     
     # Set y-limits for score panels
-    ax[0, 1].set_ylim((0, 10))
-    ax[0, 2].set_ylim((0, 10))
-    ax[1, 1].set_ylim((0, 10))
-    ax[1, 2].set_ylim((0, 10))
+    ax[0, 1].set_ylim((0, 1))
+    ax[0, 2].set_ylim((0, 1))
+    ax[1, 1].set_ylim((0, 1))
+    ax[1, 2].set_ylim((0, 1))
 
     # Create patches for the legend
     patches = []
