@@ -38,6 +38,28 @@ Due to a limited dataset (14 images total, 2-3 per camera) our approach of evalu
 ## Summary and Conclusions
 
 ## Installation
+The codes in this project are develped in Windows10 and Ubuntu 16.04.3 LTS.
+Here are the instructions for how to setup an conda environmet and execute the codes:
+
+Use the Terminal or an Anaconda Prompt for the following steps.
+
+#### Create the environment from the environment.yml file:
+
+conda env create -f environment.yml
+
+#### Activate the new environment:
+
+Windows: activate cv_project 
+macOS and Linux: source activate cv_project
+
+#### Verify that the new environment was installed correctly:
+
+conda list
+
+#### Run the Jupyter Notebook
+
+jupyter notebook
+
 
 
 
