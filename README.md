@@ -1,19 +1,3 @@
-# ECE5554 (Computer Vision) Final Project
-
-[comment]: <> (<p align="center">
-    <font size="+3">
-    <b>
-        Calibration of Satellite Cameras using Star Images <br>
-    </font>
-    <font size="+2">
-        <br>
-        Brett poche <br>
-        <br> 
-        Maimaitirebike (Muhammad Rafiq) Maimaiti <br>
-    </b>
-    </font>
-</p>)
-
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Slide1.PNG)
 
 ## Problem Statement
