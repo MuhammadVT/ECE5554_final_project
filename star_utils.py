@@ -411,12 +411,5 @@ def d_all2pd(d_params,d_labels,cols=['x_img', 'y_img', 'x_act','y_act','mag','xd
     data=[]
     for i in range(len(d_params)):
         data.append(pd.DataFrame({k+'_'+d_labels[i]: d_params[i][k] for k in (cols)}))
-#    orig_train = pd.DataFrame({k+'_orig_train': d_orig_train[k] for k in (cols)})  
-#    orig_test = pd.DataFrame({k+'_orig_test': d_orig_test[k] for k in (cols)})    
-#    new_train = pd.DataFrame({k+'_new_train': d_new_train[k] for k in (cols)})    
-#    new_test = pd.DataFrame({k+'_new_test': d_new_test[k] for k in (cols)})    
-  
-    
-    #return pd.concat([orig_train,orig_test,new_train,new_test],axis=1)
     return pd.concat(data)
             
