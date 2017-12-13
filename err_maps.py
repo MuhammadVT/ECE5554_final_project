@@ -8,24 +8,29 @@ surface fitting code adopted from:
 """
 
 
-
-def err_maps(img=['mx3'],
-                fit='linear',
-                order=None,
-                rows=1520,
-                cols=1520,
-                plot='no'):
+def err_maps(d_train,d_test,fit_type,order):
     '''
     Input:
-        x_img: numpy array of x-pixel centroid locations
-        y_img: numpy array of y-pixel centroid locations
-        x_act: numpy array of x-pixel modeled star locations
-        y_act: numpy array of y-pixel modeled locations
-        fit: 'linear','nearest', 'polyfit'type of surface fitting to use
-        order: if polyfit chosen, specify order of polyfit (ie order=3)
+        d_orig: dict of distortion the following distortion parameters
+            x_img: numpy array of x-pixel centroid locations
+            y_img: numpy array of y-pixel centroid locations
+            x_act: numpy array of x-pixel modeled star locations
+            y_act: numpy array of y-pixel modeled locations
+            xdiff: numpy array of x_img-x_act
+            ydiff: numpy array of y_img-y_act
+            mag: numpy array of magnitude of error (np.sqrt(xdiff**2+ydiff**2))
+            img: list of images used to produce above data ie (['mx1','mx2'])
+            rows: number of rows (y-pixel coordinates) in images (default = 1520)
+            cols: number of cols (x-pixel coordinates) in images (default = 1520)
+        fit_params: list of the fitting parameters 
+            fit_type: 'linear','nearest', or '2d polyfit' type of surface fitting to use
+            order: if polyfit chosen, specify order of polyfit (ie order=3)
+        
         
     Output:
-        err_maps: dict containing the following:
+        d_new_train: 
+        d_new_test: 
+        err_maps: list of dicts with the following
               'img': list of images used to create error maps
               'offx_1520': x-pixel offsets for a 1520x1520 grid
               'offy_1520': y-pixel offsets for a 1520x1520 grid
@@ -38,199 +43,238 @@ def err_maps(img=['mx3'],
               'err_mag_sci': pixel error magnitude for a 340x170 science binned grid
               
     Example Usage:
-        1) Create/plot error map using 'mx3' stars and 2d polyfit order 2
+        1) Create/plot error maps using stars from ['mx1','mx2'] and a single linear interpolation
             
-            import matplotlib.pyplot as plt
-            from err_maps import err_maps
-            img=['mx3']
-            err_maps = err_maps(img=img,fit='2d polyfit',order=2)
-            plt.imshow(err_maps['err_mag_1520'],interpolation=None)
-            plt.title('Error map offset magnitude \n'+str(img))
-            plt.xlabel('x-pixel coordinates')
-            plt.ylabel('y-pixel coordinates')
-            plt.colorbar()
+            from d_params import d_params
+            from err_maps_R1 import err_maps
+            d_params_orig = d_params(['mx1','mx2'])
+            fit=['linear']
+            order=[None]
             
-        2) Create/plot error map using stars from ['mx1','mx2','mx3'] and 
-           2d polyfit with order=2
-            
-            import matplotlib.pyplot as plt
-            from err_maps import err_maps
-            img=['mx1','mx2','mx3']
-            err_maps = err_maps(img=img,fit='2d polyfit',order=2)
-            plt.imshow(err_maps['err_mag_1520'],interpolation=None)
-            plt.title('Error map offset magnitude \n'+str(img))
-            plt.xlabel('x-pixel coordinates')
-            plt.ylabel('y-pixel coordinates')
-            plt.colorbar()
+            err_maps,d_params_new = err_maps(d_params,fit,order)
+        
     '''
     import itertools
     import numpy as np
     from scipy.interpolate import griddata
-    from star_utils import img_stars,load_stars,rebin,trim
+    from star_utils import rebin,trim
     import scipy.linalg
+    import skimage
+    from skimage.transform import rescale, resize, downscale_local_mean
+    import pdb
+
     
-    data = load_stars()
-    x_act=[]
-    y_act=[]
-    x_img=[]
-    y_img=[]
-    for i in range(len(img)):
-        col_list = ['x_act_'+img[i],
-                    'y_act_'+img[i],
-                    'x_img_'+img[i],
-                    'y_img_'+img[i]]
-        df = img_stars(data,img[i],col_list)
-        x_act.append(list(df['x_act_'+img[i]]))
-        y_act.append(list(df['y_act_'+img[i]]))
-        x_img.append(list(df['x_img_'+img[i]]))
-        y_img.append(list(df['y_img_'+img[i]]))
-    x_act = np.array([item for sublist in x_act for item in sublist])
-    y_act = np.array([item for sublist in y_act for item in sublist])
-    x_img = np.array([item for sublist in x_img for item in sublist])
-    y_img = np.array([item for sublist in y_img for item in sublist])
- 
-    xdiff = x_img-x_act
-    ydiff = y_img-y_act
-    mag = np.sqrt((x_img-x_act)**2+(y_img-y_act)**2)
-    angle = np.arctan2(y_img-759.5,x_img-759.5)
-    for i in range(0,angle.size):
-        if angle[i] < 0:
-            angle[i] = angle[i] + 360*np.pi/180.0
-    x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
-    y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+    x = np.linspace(-d_train['rows']/2.0 + .5,d_train['rows']/2.0 - .5, d_train['rows'])
+    y = np.linspace(-d_train['cols']/2.0 + .5,d_train['cols']/2.0 - .5, d_train['cols'])
     x,y = np.meshgrid(x,y)
+    d_new_train=[]
+    d_new_test=[]
+    e_maps={'offx_1520':[],
+          'offy_1520':[],
+          'err_mag_1520':[],
+          'offx_1360':[],
+          'offy_1360':[],
+          'err_mag_1360':[],
+          'offx_sci':[],
+          'offy_sci':[],
+          'err_mag_sci':[]}
     
-    if fit == 'linear':
-        xy = np.array([x_img-759.5,y_img-759.5]).transpose()
-        zz_x = griddata(xy,xdiff,(x,y),method='linear')
-        zz_y = griddata(xy,ydiff,(x,y),method='linear')
-        zz_mag = griddata(xy,mag,(x,y),method='linear')
-        
-    if fit == 'nearest':
-        xy = np.array([x_img-759.5,y_img-759.5]).transpose()
-        zz_x = griddata(xy,xdiff,(x,y),method='nearest')
-        zz_y = griddata(xy,ydiff,(x,y),method='nearest')
-        zz_mag = griddata(xy,mag,(x,y),method='nearest')
-        
-    if fit == 'surface':
-       order = 2
-       data_xdiff = np.array([x_img,y_img,xdiff]).T
-       data_ydiff = np.array([x_img,y_img,ydiff]).T 
-       data_mag = np.array([x_img,y_img,mag]).T 
-       
-       data = data_xdiff/100.0
-       rows=15
-       cols=15
-       x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
-       y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
-       X,Y = np.meshgrid(x,y)
-       XX = X.flatten()
-       YY = Y.flatten()
-       # best-fit quadratic curve
-       A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
-       C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+    fit_type=[fit_type]
+    order = [order]
     
-       # evaluate it on a grid
-       zz_x = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
-       zz_x = scipy.misc.imresize(zz_x, (1520,1520))
-       
-       data = data_ydiff/100.0
-       rows=15
-       cols=15
-       x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
-       y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
-       X,Y = np.meshgrid(x,y)
-       XX = X.flatten()
-       YY = Y.flatten()
-       # best-fit quadratic curve
-       A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
-       C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
-       
-       # evaluate it on a grid
-       zz_y = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
-       zz_y = scipy.misc.imresize(zz_y, (1520,1520))
-       
-       data = data_mag/100.0
-       rows=15
-       cols=15
-       x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
-       y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
-       X,Y = np.meshgrid(x,y)
-       XX = X.flatten()
-       YY = Y.flatten()
-       # best-fit quadratic curve
-       A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
-       C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
-       
-       # evaluate it on a grid
-       zz_mag = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
-       zz_mag = scipy.misc.imresize(zz_mag, (1520,1520))
-        
-    if fit == '2d polyfit':
-        def polyfit2d(x, y, z, order=order):
-            ncols = (order + 1)**2
-            G = np.zeros((x.size, ncols))
-            ij = itertools.product(range(order+1), range(order+1))
-            for k, (i,j) in enumerate(ij):
-                G[:,k] = x**i * y**j
-            m, _, _, _ = np.linalg.lstsq(G, z)
-            return m
+    #Can remove this for loop in the future
+    for i in range(len(fit_type)):
+        #Discard all NAN values in arrays and store in temporary arrays
+        x_img_=d_train['x_img'][~np.isnan(d_train['x_img'])]
+        y_img_=d_train['y_img'][~np.isnan(d_train['y_img'])]
+        xdiff_=d_train['xdiff'][~np.isnan(d_train['xdiff'])]
+        ydiff_=d_train['ydiff'][~np.isnan(d_train['ydiff'])]
+        mag_=d_train['mag'][~np.isnan(d_train['mag'])]
+        if fit_type[i] == 'linear':
+            xy = np.array([x_img_-759.5,y_img_-759.5]).transpose()
+            zz_x = griddata(xy,xdiff_,(x,-y),method='linear')
+            zz_y = griddata(xy,ydiff_,(x,-y),method='linear')
+            zz_mag = griddata(xy,mag_,(x,-y),method='linear')
             
-        def polyval2d(x, y, m):
-            order = int(np.sqrt(len(m))) - 1
-            ij = itertools.product(range(order+1), range(order+1))
-            z = np.zeros_like(x)
-            for a, (i,j) in zip(m, ij):
-                z += a * x**i * y**j
-            return z
+        if fit_type[i] == 'nearest':
+            xy = np.array([x_img_-759.5,y_img_-759.5]).transpose()
+            zz_x = griddata(xy,xdiff_,(x,-y),method='nearest')
+            zz_y = griddata(xy,ydiff_,(x,-y),method='nearest')
+            zz_mag = griddata(xy,mag_,(x,-y),method='nearest')
+            
+        if fit_type[i] == 'surface':
+           order = 2
+           data_xdiff = np.array([x_img_,y_img_,xdiff_]).T
+           data_ydiff = np.array([x_img_,y_img_,ydiff_]).T 
+           data_mag = np.array([x_img_,y_img_,mag_]).T 
+           
+           data = data_xdiff/100.0
+           rows=15
+           cols=15
+           x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
+           y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+           X,Y = np.meshgrid(x,y)
+           XX = X.flatten()
+           YY = Y.flatten()
+           # best-fit quadratic curve
+           A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
+           C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
         
-        # Generate Data...
-        x = x_img
-        y = y_img
-        z_x = xdiff
-        z_y = ydiff
-        z_mag = mag
-    
-        # Fit a 3rd order, 2d polynomial
-        m_x = polyfit2d(x,y,z_x)
-        m_y = polyfit2d(x,y,z_y)
-        m_mag = polyfit2d(x,y,z_mag)
-    
-        # Evaluate it on a grid...
-        #rows, cols = 1520, 1520
-        xx, yy = np.meshgrid(np.linspace(x.min(), x.max(), rows), 
-                             np.linspace(y.min(), y.max(), rows))
-        zz_x = polyval2d(xx, yy, m_x)
-        zz_y = polyval2d(xx, yy, m_y)
-        zz_mag = polyval2d(xx, yy, m_mag)
+           # evaluate it on a grid
+           zz_x = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
+           zz_x = skimage.transform.resize(zz_x, (1520,1520))
+           
+           data = data_ydiff/100.0
+           rows=15
+           cols=15
+           x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
+           y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+           X,Y = np.meshgrid(x,y)
+           XX = X.flatten()
+           YY = Y.flatten()
+           # best-fit quadratic curve
+           A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
+           C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+           
+           # evaluate it on a grid
+           zz_y = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
+           zz_y = scipy.misc.imresize(zz_y, (1520,1520))
+           
+           data = data_mag/100.0
+           rows=15
+           cols=15
+           x = np.linspace(-rows/2.0 + .5,rows/2.0 - .5, rows)
+           y = np.linspace(-cols/2.0 + .5,cols/2.0 - .5, cols)
+           X,Y = np.meshgrid(x,y)
+           XX = X.flatten()
+           YY = Y.flatten()
+           # best-fit quadratic curve
+           A = np.c_[np.ones(data.shape[0]), data[:,:2], np.prod(data[:,:2], axis=1), data[:,:2]**2]
+           C,_,_,_ = scipy.linalg.lstsq(A, data[:,2])
+           
+           # evaluate it on a grid
+           zz_mag = np.dot(np.c_[np.ones(XX.shape), XX, YY, XX*YY, XX**2, YY**2], C).reshape(X.shape)
+           zz_mag = scipy.misc.imresize(zz_mag, (1520,1520))
+            
+        if fit_type[i] == '2d polyfit':
+            def polyfit2d(x, y, z, order=order[i]):
+                ncols = (order + 1)**2
+                G = np.zeros((x.size, ncols))
+                ij = itertools.product(range(order+1), range(order+1))
+                for k, (i,j) in enumerate(ij):
+                    G[:,k] = x**i * y**j
+                m, _, _, _ = np.linalg.lstsq(G, z)
+                return m
+                
+            def polyval2d(x, y, m):
+                order = int(np.sqrt(len(m))) - 1
+                ij = itertools.product(range(order+1), range(order+1))
+                z = np.zeros_like(x)
+                for a, (i,j) in zip(m, ij):
+                    z += a * x**i * y**j
+                return z
+            
+            # Generate Data...
+            x = x_img_
+            y = y_img_
+            z_x = xdiff_
+            z_y = ydiff_
+            z_mag = mag_
+        
+            # Fit a 3rd order, 2d polynomial
+            m_x = polyfit2d(x,-y,z_x)
+            m_y = polyfit2d(x,-y,z_y)
+            m_mag = polyfit2d(x,-y,z_mag)
+        
+            # Evaluate it on a grid...
+            #rows, cols = 1520, 1520
+            xx, yy = np.meshgrid(np.linspace(x.min(), x.max(), d_train['cols']), 
+                                 np.linspace(y.min(), y.max(), d_train['rows']))
+            zz_x = polyval2d(xx, yy, m_x)
+            zz_y = polyval2d(xx, yy, m_y)
+            zz_mag = polyval2d(xx, yy, m_mag)
         
 
-    offx_1520=zz_x
-    offy_1520=zz_y
-    err_mag_1520=zz_mag
+        #Generate Error map data
+        e_maps['img']=d_train['img']
+        
+        e_maps['offx_1520'].append(zz_x)
+        e_maps['offy_1520'].append(zz_y)
+        e_maps['err_mag_1520'].append(zz_mag)
+        
+        e_maps['offx_1360'].append(trim(zz_x,(1360,1360)))
+        e_maps['offy_1360'].append(trim(zz_y,(1360,1360)))
+        e_maps['err_mag_1360'].append(trim(zz_mag,(1360,1360)))
+        
+        e_maps['offx_sci'].append(rebin(e_maps['offx_1360'][i],(340,170))/8.0)
+        e_maps['offy_sci'].append(rebin(e_maps['offy_1360'][i],(340,170))/4.0)
+        e_maps['err_mag_sci'].append(np.sqrt(e_maps['offx_sci'][i]**2 + e_maps['offy_sci'][i]**2))
+        
+        #Apply error maps created with training data to TRAINING set
+        x_img_new=[]
+        y_img_new=[]
+        #pdb.set_trace()
+        for j in range(len(d_train['x_img'])):
+            if np.isnan(d_train['mag'][j]):
+                x_img_new.append(np.nan)
+                y_img_new.append(np.nan)
+            if np.isnan(d_train['mag'][j]) == False:
+                x_img_new.append(d_train['x_img'][j] - e_maps['offx_1520'][i][int(d_train['x_img'][j]),int(d_train['y_img'][j])])
+                y_img_new.append(d_train['y_img'][j] - e_maps['offy_1520'][i][int(d_train['x_img'][j]),int(d_train['y_img'][j])])
+        x_img_new=np.array(x_img_new)
+        y_img_new=np.array(y_img_new)
+        
+        xdiff_new = x_img_new - d_train['x_act']
+        ydiff_new = y_img_new - d_train['y_act']
+        mag_new = np.sqrt(xdiff_new**2+ydiff_new**2)
+        
+        d_new_train = {'x_img':x_img_new,
+                       'x_act':d_train['x_act'],
+                       'xdiff':xdiff_new,
+                       'y_img':y_img_new,
+                       'y_act':d_train['y_act'],
+                       'ydiff':ydiff_new,
+                       'mag':mag_new,
+                       'img':d_train['img'],
+                       'rows':d_train['rows'],
+                       'cols':d_train['cols']
+                       }
+        
+        
+        #Apply error maps created with training data to TESTING set
+        x_img_new=[]
+        y_img_new=[]
+        #pdb.set_trace()
+        for j in range(len(d_test['x_img'])):
+            if np.isnan(d_test['x_img'][j]):
+                x_img_new.append(np.nan)
+            if np.isnan(d_test['y_img'][j]):
+                y_img_new.append(np.nan)
+            if np.isnan(d_test['y_img'][j]) == False:
+                x_img_new.append(d_test['x_img'][j] - e_maps['offx_1520'][i][int(d_test['x_img'][j]),int(d_test['y_img'][j])])
+                y_img_new.append(d_test['y_img'][j] - e_maps['offy_1520'][i][int(d_test['x_img'][j]),int(d_test['y_img'][j])])
+        x_img_new=np.array(x_img_new)
+        y_img_new=np.array(y_img_new)
+        
+        xdiff_new = x_img_new - d_test['x_act']
+        ydiff_new = y_img_new - d_test['y_act']
+        mag_new = np.sqrt(xdiff_new**2+ydiff_new**2)
+        
+        d_new_test = {'x_img':x_img_new,
+                      'x_act':d_test['x_act'],
+                      'xdiff':xdiff_new,
+                      'y_img':y_img_new,
+                      'y_act':d_test['y_act'],
+                      'ydiff':ydiff_new,
+                      'mag':mag_new,
+                      'img':d_test['img'],
+                      'rows':d_test['rows'],
+                      'cols':d_test['cols']
+                      }
     
-    offx_1360 = trim(zz_x,(1360,1360))
-    offy_1360 = trim(zz_y,(1360,1360))
-    err_mag_1360 = trim(zz_mag,(1360,1360))
-    
-    offx_sci=rebin(offx_1360,(340,170))/8.0
-    offy_sci=rebin(offy_1360,(340,170))/4.0
-    err_mag_sci=np.sqrt(offx_sci**2 + offy_sci**2)
-    
-    err_maps={'img':img,
-              'offx_1520':offx_1520,
-              'offy_1520':offy_1520,
-              'err_mag_1520':err_mag_1520,
-              'offx_1360':offx_1360,
-              'offy_1360':offy_1360,
-              'err_mag_1360':err_mag_1360,
-              'offx_sci':offx_sci,
-              'offy_sci':offy_sci,
-              'err_mag_sci':err_mag_sci}
-    
-    return err_maps
+    return e_maps,d_new_test,d_new_train
 
-def err_compare(img,err_maps,plot_dmap=False):
+def err_compare(d_old,d_new,err_maps,plot_dmap=False):
     '''
     Apply an error map to the centroid coordinates of a given list of images
     and return statistics of the error. Option to plot distortion map.
@@ -253,70 +297,34 @@ def err_compare(img,err_maps,plot_dmap=False):
             err_map = err_maps(['mx1','mx2'],fit='2d polyfit',order=2)
             err_info = err_compare(['mx3'],err_map,plot_dmap=True)
     '''
-    from star_utils import img_stars,load_stars
     from dmap import dmap
-    import numpy as np
     import pandas as pd
     
-    data=load_stars()
-    x_act=[]
-    y_act=[]
-    x_img=[]
-    y_img=[]
-    for i in range(len(img)):
-        col_list = ['x_act_'+img[i],
-                    'y_act_'+img[i],
-                    'x_img_'+img[i],
-                    'y_img_'+img[i]]
-        df = img_stars(data,img[i],col_list)
-        x_act.append(list(df['x_act_'+img[i]]))
-        y_act.append(list(df['y_act_'+img[i]]))
-        x_img.append(list(df['x_img_'+img[i]]))
-        y_img.append(list(df['y_img_'+img[i]]))
-    x_act = np.array([item for sublist in x_act for item in sublist])
-    y_act = np.array([item for sublist in y_act for item in sublist])
-    x_img = np.array([item for sublist in x_img for item in sublist])
-    y_img = np.array([item for sublist in y_img for item in sublist])
-    
-    x_img_new=[]
-    y_img_new=[]
-    for i in range(len(x_img)):
-        x_img_new.append(x_img[i] - err_maps['offx_1520'][int(x_img[i]),int(y_img[i])])
-        y_img_new.append(y_img[i] - err_maps['offy_1520'][int(x_img[i]),int(y_img[i])])
-    x_img_new=np.array(x_img_new)
-    y_img_new=np.array(y_img_new)
-    
-    x_err_old = x_img - x_act
-    y_err_old = y_img - y_act
-    mag_err_old = np.sqrt(x_err_old**2+y_err_old**2)
-    
-    x_err_new = x_img_new - x_act
-    y_err_new = y_img_new - y_act
-    mag_err_new = np.sqrt(x_err_new**2+y_err_new**2)
-    
-    err_info = {'x_err_old_'+img[0]:x_err_old,
-                'y_err_old_'+img[0]:y_err_old,
-                'mag_err_old_'+img[0]:mag_err_old,
-                'x_err_new_'+img[0]:x_err_new,
-                'y_err_new_'+img[0]:y_err_new,
-                'mag_err_new':mag_err_new,
-                'x_img_'+img[0]:x_img,
-                'y_img_'+img[0]:y_img,
-                'x_act_'+img[0]:x_act,
-                'y_act_'+img[0]:y_act,
-                'x_img_new_'+img[0]:x_img_new,
-                'y_img_new_'+img[0]:y_img_new
+    img = d_old['img']
+    err_info = {'x_err_old_'+img[0]:d_old['xdiff'],
+                'y_err_old_'+img[0]:d_old['ydiff'],
+                'mag_err_old_'+img[0]:d_old['mag'],
+                'x_err_new_'+img[0]:d_new['xdiff'],
+                'y_err_new_'+img[0]:d_new['ydiff'],
+                'mag_err_new_'+img[0]:d_new['mag'],
+                'x_img_'+img[0]:d_old['x_img'],
+                'y_img_'+img[0]:d_old['y_img'],
+                'x_act_'+img[0]:d_old['x_act'],
+                'y_act_'+img[0]:d_old['y_act'],
+                'x_img_new_'+img[0]:d_new['x_img'],
+                'y_img_new_'+img[0]:d_new['y_img']
                 }
     
     if plot_dmap == True:
-        data_dmap = {'x_img_'+img[0]:x_img,
-                    'y_img_'+img[0]:y_img,
-                    'x_act_'+img[0]:x_act,
-                    'y_act_'+img[0]:y_act,
-                    'x_img_new_'+img[0]:x_img_new,
-                    'y_img_new_'+img[0]:y_img_new,
-                    'mag_err_old_'+img[0]:mag_err_old,
-                    'mag_err_new_'+img[0]:mag_err_new}
+        data_dmap = {'x_img_'+img[0]:d_old['x_img'],
+                     'y_img_'+img[0]:d_old['y_img'],
+                     'x_act_'+img[0]:d_old['x_act'],
+                     'y_act_'+img[0]:d_old['y_act'],
+                     'x_img_new_'+img[0]:d_new['x_img'],
+                     'y_img_new_'+img[0]:d_new['y_img'],
+                     'mag_err_old_'+img[0]:d_old['mag'],
+                     'mag_err_new_'+img[0]:d_new['mag']}
+        
         err_data = pd.DataFrame(data_dmap)
         
         dmap(err_data,
