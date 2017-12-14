@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 def fetch_data(camera, image_num):
     """ Fetches the star data from a given image taken from a given camera
     Parameters
@@ -126,3 +128,10 @@ def train_predict(learner, sample_size, X_train, y_train, X_test, y_test):
         
     # return the results
     return results
+
+def pol2cart(phi, rho):
+    import numpy as np
+    x = np.multiply(rho, np.cos(phi)) 
+    y = np.multiply(rho, np.sin(phi))
+    return x, y
+
