@@ -30,8 +30,8 @@ def fetch_data(camera, image_num):
             if np.array([cam + str(i) in x for x in df.columns]).any():
                 regex_x = "x_img_.*" + cam + str(i)
                 regex_y = "y_img_.*" + cam + str(i)
-                df.loc[:, "err_azm_" + cam + str(i)] = np.arctan2(dfn.filter(regex=regex_y).as_matrix(), 
-                                                            dfn.filter(regex=regex_y).as_matrix())
+                df.loc[:, "err_azm_" + cam + str(i)] = np.rad2deg(np.arctan2(dfn.filter(regex=regex_y).as_matrix(), 
+                                                            dfn.filter(regex=regex_x).as_matrix()))
     
     return df
 
@@ -42,23 +42,23 @@ def prepare_data(df, camera, image_nums=["1", "2"]):
     x = []
     y = []
     for l in image_nums:
-            regex_txt = "err_.*" + camera + l
-            dfn = df.filter(regex=regex_txt)
-            dfn.dropna(inplace=True)
-            cols = ["err_mag_" + camera + l, "err_ang_"+ camera + l, "err_azm_"+ camera + l]
-            df_tmp = dfn.loc[:, cols]
+        regex_txt = "err_.*" + camera + l
+        dfn = df.filter(regex=regex_txt)
+        dfn.dropna(inplace=True)
+        cols = ["err_mag_" + camera + l, "err_ang_"+ camera + l, "err_azm_"+ camera + l]
+        df_tmp = dfn.loc[:, cols]
 
-            # correct "err_ang_*" of the error vectors
-            df_tmp.loc[:, "err_ang_"+ camera + l] = (180. - df_tmp.loc[:, "err_ang_"+ camera + l]) +\
-                                                    df_tmp.loc[:, "err_azm_"+ camera + l]
-            df_tmp.drop("err_azm_"+ camera + l, inplace=True)
+        # correct "err_ang_*" of the error vectors
+        df_tmp.loc[:, "err_ang_"+ camera + l] = (180. - df_tmp.loc[:, "err_ang_"+ camera + l]) +\
+                                                df_tmp.loc[:, "err_azm_"+ camera + l]
+        df_tmp.drop(columns=["err_azm_"+ camera + l], inplace=True)
 
-            y.append(df_tmp.as_matrix())
+        y.append(df_tmp.as_matrix())
 
-            cols = ["err_r_" + camera + l, "err_azm_" + camera + l]
-            #cols = ["err_r_" + camera + l]
-            df_tmp = dfn.loc[:, cols]
-            x.append(df_tmp.as_matrix())
+        cols = ["err_r_" + camera + l, "err_azm_" + camera + l]
+        #cols = ["err_r_" + camera + l]
+        df_tmp = dfn.loc[:, cols]
+        x.append(df_tmp.as_matrix())
             
     y = np.vstack(tuple(y))
     x = np.vstack(tuple(x))
