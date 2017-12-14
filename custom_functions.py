@@ -1,67 +1,38 @@
 import pandas as pd
 import numpy as np
-def fetch_data(camera, image_num):
-    """ Fetches the star data from a given image taken from a given camera
+def prepare_data(camera, image_nums):
+    """ Prepares the data for creating ML models  
     Parameters
     ----------
     camera : str
         The camera name
-    image_num: str
-        The number of an image from a camera. 
-        If set to ".", all the images will be returned
+    image_nums: list
+        The labels of images from a camera. 
         
     Returns
     -------
-    Pandas.DataFrames
-        Returns a data fram with NaN entries removed
+    numpy arrays
+        Returns the perdictors and targets seperately
     """
-    # Load all the star data
-    data = pd.read_csv('./data/image_database.txt')
-    
-    # Fetch the data of interest set by "camera" and "image_num"
-    regex_txt = "err_.*" + camera + image_num
-    df = data.filter(regex=regex_txt)
+    from gen_d_params import gen_d_params
+
+    # Fetch the data of interest set by "camera" and "image_nums"
+    imgs = [camera + x for x in image_nums]
+    d_params = gen_d_params(imgs)
     
     # Add azimuth feature for pixel location
-    regex_txt = "._img_.*" + camera + image_num
-    dfn = data.filter(regex=regex_txt)
-    for cam in ["mx", "my", "px", "py"]:
-        for i in range(5):
-            if np.array([cam + str(i) in x for x in df.columns]).any():
-                regex_x = "x_img_.*" + cam + str(i)
-                regex_y = "y_img_.*" + cam + str(i)
-                df.loc[:, "err_azm_" + cam + str(i)] = np.rad2deg(np.arctan2(dfn.filter(regex=regex_y).as_matrix(), 
-                                                            dfn.filter(regex=regex_x).as_matrix()))
-    
-    return df
-
-
-def prepare_data(df, camera, image_nums=["1", "2"]):
-    """ Creates features and split the data into training and testing datasets
-    """
-    x = []
-    y = []
-    for l in image_nums:
-        regex_txt = "err_.*" + camera + l
-        dfn = df.filter(regex=regex_txt)
-        dfn.dropna(inplace=True)
-        cols = ["err_mag_" + camera + l, "err_ang_"+ camera + l, "err_azm_"+ camera + l]
-        df_tmp = dfn.loc[:, cols]
-
-        # correct "err_ang_*" of the error vectors
-        df_tmp.loc[:, "err_ang_"+ camera + l] = (180. - df_tmp.loc[:, "err_ang_"+ camera + l]) +\
-                                                df_tmp.loc[:, "err_azm_"+ camera + l]
-        df_tmp.drop(columns=["err_azm_"+ camera + l], inplace=True)
-
-        y.append(df_tmp.as_matrix())
-
-        cols = ["err_r_" + camera + l, "err_azm_" + camera + l]
-        #cols = ["err_r_" + camera + l]
-        df_tmp = dfn.loc[:, cols]
-        x.append(df_tmp.as_matrix())
+    d_params["err_ang"] = np.rad2deg(np.arctan2(d_params["ydiff"], d_params["xdiff"]))
+    d_params["r_img"] = np.sqrt(np.power(d_params["x_img"], 2) + np.power(d_params["y_img"], 2)) 
+    d_params["err_mag"] = d_params.pop("mag")
+    d_params["azm_img"] = np.rad2deg(np.arctan2(d_params["y_img"], d_params["x_img"]))
             
-    y = np.vstack(tuple(y))
-    x = np.vstack(tuple(x))
+    x1 = np.reshape(d_params["r_img"], (len(d_params["r_img"]), 1))
+    x2 = np.reshape(d_params["azm_img"], (len(d_params["azm_img"]), 1))
+    x = np.hstack((x1, x2))
+    y1 = np.reshape(d_params["err_mag"], (len(d_params["err_mag"]), 1))
+    y2 = np.reshape(d_params["err_ang"], (len(d_params["err_ang"]), 1))
+    y = np.hstack((y1, y2))
+
     return x, y
 
 def train_predict(learner, sample_size, X_train, y_train, X_test, y_test): 
