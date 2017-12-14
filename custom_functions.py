@@ -45,9 +45,16 @@ def prepare_data(df, camera, image_nums=["1", "2"]):
             regex_txt = "err_.*" + camera + l
             dfn = df.filter(regex=regex_txt)
             dfn.dropna(inplace=True)
-            cols = ["err_mag_" + camera + l, "err_ang_"+ camera + l]
+            cols = ["err_mag_" + camera + l, "err_ang_"+ camera + l, "err_azm_"+ camera + l]
             df_tmp = dfn.loc[:, cols]
+
+            # correct "err_ang_*" of the error vectors
+            df_tmp.loc[:, "err_ang_"+ camera + l] = (180. - df_tmp.loc[:, "err_ang_"+ camera + l]) +\
+                                                    df_tmp.loc[:, "err_azm_"+ camera + l]
+            df_tmp.drop("err_azm_"+ camera + l, inplace=True)
+
             y.append(df_tmp.as_matrix())
+
             cols = ["err_r_" + camera + l, "err_azm_" + camera + l]
             #cols = ["err_r_" + camera + l]
             df_tmp = dfn.loc[:, cols]
@@ -56,8 +63,6 @@ def prepare_data(df, camera, image_nums=["1", "2"]):
     y = np.vstack(tuple(y))
     x = np.vstack(tuple(x))
     return x, y
-
-
 
 def train_predict(learner, sample_size, X_train, y_train, X_test, y_test): 
     """
