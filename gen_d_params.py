@@ -8,8 +8,9 @@ def gen_d_params(img,rows=1520,cols=1520):
     '''
     Load distortion maps paramaters into dict
     Input:
-        img_list: list of images used to produce above data ie (['mx1','mx2'])
-            
+        img: list of images used to produce above data ie (['mx1','mx2'])
+        rows: number of rows in image data (default =1520)   
+        cols: number of cols in image data (default =1520)
     Output:
         d_orig: dict of distortion the following distortion parameters
             x_img: numpy array of x-pixel centroid locations
@@ -36,6 +37,7 @@ def gen_d_params(img,rows=1520,cols=1520):
     y_act=[]
     x_img=[]
     y_img=[]
+    starname=[]
     for i in range(len(img)):
         col_list = ['x_act_'+img[i],
                     'y_act_'+img[i],
@@ -46,6 +48,7 @@ def gen_d_params(img,rows=1520,cols=1520):
         y_act.append(list(df['y_act_'+img[i]]))
         x_img.append(list(df['x_img_'+img[i]]))
         y_img.append(list(df['y_img_'+img[i]]))
+        starname.append(list(df.index))
     x_act = np.array([item for sublist in x_act for item in sublist])
     y_act = np.array([item for sublist in y_act for item in sublist])
     x_img = np.array([item for sublist in x_img for item in sublist])
@@ -55,7 +58,8 @@ def gen_d_params(img,rows=1520,cols=1520):
     ydiff = y_img-y_act
     mag = np.sqrt((x_img-x_act)**2+(y_img-y_act)**2)     
     
-    d_params = {'x_img':x_img,
+    d_params = {'starname':starname[0],
+                'x_img':x_img,
                 'x_act':x_act,
                 'xdiff':xdiff,
                 'y_img':y_img,
