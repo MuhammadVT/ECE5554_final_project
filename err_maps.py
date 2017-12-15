@@ -11,7 +11,7 @@ surface fitting code adopted from:
 def err_maps(d_train,d_test,fit_type,order):
     '''
     Input:
-        d_orig: dict of distortion the following distortion parameters
+        d_train: dict of distortion parameters for training dataset
             x_img: numpy array of x-pixel centroid locations
             y_img: numpy array of y-pixel centroid locations
             x_act: numpy array of x-pixel modeled star locations
@@ -22,15 +22,16 @@ def err_maps(d_train,d_test,fit_type,order):
             img: list of images used to produce above data ie (['mx1','mx2'])
             rows: number of rows (y-pixel coordinates) in images (default = 1520)
             cols: number of cols (x-pixel coordinates) in images (default = 1520)
-        fit_params: list of the fitting parameters 
-            fit_type: 'linear','nearest', or '2d polyfit' type of surface fitting to use
-            order: if polyfit chosen, specify order of polyfit (ie order=3)
+        d_test: dict of distortion parameters for testing dataset (same as above)
         
+        fit_type: 'linear','nearest', or '2d polyfit' type of surface fitting to use
+        order: if polyfit chosen, specify order of polyfit (ie order=3)
         
+     return e_maps,d_new_test,d_new_train   
     Output:
-        d_new_train: 
-        d_new_test: 
-        err_maps: list of dicts with the following
+        d_new_train: dict of distortion parameters for training dataset after error correction
+        d_new_test: dict of distortion parameters for testing dataset after error correction
+        e_maps: list of dicts with the following
               'img': list of images used to create error maps
               'offx_1520': x-pixel offsets for a 1520x1520 grid
               'offy_1520': y-pixel offsets for a 1520x1520 grid
@@ -211,34 +212,36 @@ def err_maps(d_train,d_test,fit_type,order):
         e_maps['err_mag_sci'].append(np.sqrt(e_maps['offx_sci'][i]**2 + e_maps['offy_sci'][i]**2))
         
         #Apply error maps created with training data to TRAINING set
-        x_img_new=[]
-        y_img_new=[]
+        x_img_new_train=[]
+        y_img_new_train=[]
         #pdb.set_trace()
         for j in range(len(d_train['x_img'])):
             if np.isnan(d_train['mag'][j]):
-                x_img_new.append(np.nan)
-                y_img_new.append(np.nan)
+                x_img_new_train.append(np.nan)
+                y_img_new_train.append(np.nan)
             if np.isnan(d_train['mag'][j]) == False:
-                x_img_new.append(d_train['x_img'][j] - e_maps['offx_1520'][i][int(d_train['x_img'][j]),int(d_train['y_img'][j])])
-                y_img_new.append(d_train['y_img'][j] - e_maps['offy_1520'][i][int(d_train['x_img'][j]),int(d_train['y_img'][j])])
-        x_img_new=np.array(x_img_new)
-        y_img_new=np.array(y_img_new)
+                x_img_new_train.append(d_train['x_img'][j] - e_maps['offx_1520'][i][int(d_train['x_img'][j]),int(d_train['y_img'][j])])
+                y_img_new_train.append(d_train['y_img'][j] - e_maps['offy_1520'][i][int(d_train['x_img'][j]),int(d_train['y_img'][j])])
+        x_img_new_train=np.array(x_img_new_train)
+        y_img_new_train=np.array(y_img_new_train)
         
-        xdiff_new = x_img_new - d_train['x_act']
-        ydiff_new = y_img_new - d_train['y_act']
-        mag_new = np.sqrt(xdiff_new**2+ydiff_new**2)
+        xdiff_new_train = x_img_new_train - d_train['x_act']
+        ydiff_new_train = y_img_new_train - d_train['y_act']
+        mag_new_train = np.sqrt(xdiff_new_train**2+ydiff_new_train**2)
         
-        d_new_train = {'x_img':x_img_new,
+        d_new_train = {'starname':d_train['starname'],
+                       'x_img':x_img_new_train,
                        'x_act':d_train['x_act'],
-                       'xdiff':xdiff_new,
-                       'y_img':y_img_new,
+                       'xdiff':xdiff_new_train,
+                       'y_img':y_img_new_train,
                        'y_act':d_train['y_act'],
-                       'ydiff':ydiff_new,
-                       'mag':mag_new,
+                       'ydiff':ydiff_new_train,
+                       'mag':mag_new_train,
                        'img':d_train['img'],
                        'rows':d_train['rows'],
                        'cols':d_train['cols']
                        }
+        
         
         
         #Apply error maps created with training data to TESTING set
@@ -246,21 +249,24 @@ def err_maps(d_train,d_test,fit_type,order):
         y_img_new=[]
         #pdb.set_trace()
         for j in range(len(d_test['x_img'])):
-            if np.isnan(d_test['x_img'][j]):
+            
+            
+            if np.isnan(d_test['mag'][j]):
                 x_img_new.append(np.nan)
-            if np.isnan(d_test['y_img'][j]):
                 y_img_new.append(np.nan)
-            if np.isnan(d_test['y_img'][j]) == False:
+            if np.isnan(d_test['mag'][j]) == False:
                 x_img_new.append(d_test['x_img'][j] - e_maps['offx_1520'][i][int(d_test['x_img'][j]),int(d_test['y_img'][j])])
                 y_img_new.append(d_test['y_img'][j] - e_maps['offy_1520'][i][int(d_test['x_img'][j]),int(d_test['y_img'][j])])
         x_img_new=np.array(x_img_new)
         y_img_new=np.array(y_img_new)
+    
         
         xdiff_new = x_img_new - d_test['x_act']
         ydiff_new = y_img_new - d_test['y_act']
         mag_new = np.sqrt(xdiff_new**2+ydiff_new**2)
         
-        d_new_test = {'x_img':x_img_new,
+        d_new_test = {'starname':d_test['starname'],
+                      'x_img':x_img_new,
                       'x_act':d_test['x_act'],
                       'xdiff':xdiff_new,
                       'y_img':y_img_new,
@@ -271,7 +277,7 @@ def err_maps(d_train,d_test,fit_type,order):
                       'rows':d_test['rows'],
                       'cols':d_test['cols']
                       }
-    
+    #pdb.set_trace()
     return e_maps,d_new_test,d_new_train
 
 def err_compare(d_old,d_new,err_maps,plot_dmap=False):
