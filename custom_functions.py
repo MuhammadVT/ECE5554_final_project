@@ -112,7 +112,7 @@ def pol2cart(phi, rho):
 
     return x, y
 
-def dmap_compare_v2(d_old, d_new,
+def dmap_compare_v2(d_old, yhat,
 		    suptitle='Distortion Map Comparison',
 		    title1='Original Distortion Map',
 		    title2='Distortion Map after error correction'):
@@ -121,6 +121,20 @@ def dmap_compare_v2(d_old, d_new,
     from matplotlib.colors import Normalize
     import matplotlib.cm as cm
     import matplotlib.pyplot as plt
+
+    d_new = d_old.copy()
+    x_, y_ = pol2cart(np.deg2rad(yhat[:,1]), yhat[:, 0])
+
+    #######
+    d_new["x_img"] = d_old["x_img"] - x_
+    d_new["y_img"] = d_old["y_img"] - y_
+
+    #d_new["x_img"] = d_old["x_img"] - d_old['xdiff']
+    #d_new["y_img"] = d_old["y_img"] - d_old['ydiff']
+
+    d_new["xdiff"] = d_new["x_img"] - d_new["x_act"]
+    d_new["ydiff"] = d_new["y_img"] - d_new["y_act"]
+    d_new["mag"] = np.sqrt(d_new["xdiff"] ** 2 + d_new["ydiff"] ** 2)
 
     dmap_old = dmap(d_old,show_plot=False)
     dmap_new = dmap(d_new,show_plot=False)
@@ -134,18 +148,18 @@ def dmap_compare_v2(d_old, d_new,
     fig.set_tight_layout(False)
 
     ax1=plt.subplot(121)
-    dm=dmap_old
+    dm=dmap_old.copy()
     plt.title(title1)
     plt.quiver(dm['v_err_loc_x'],dm['v_err_loc_y'],
-              dm['v_err_x'],dm['v_err_y'],
+              dm['v_err_x'],dm['v_err_y'], angles='xy', scale_units='xy', scale=0.02,
               color=colormap(norm(dm['v_colors'])))
     fig.colorbar(sm)
 
     ax2=plt.subplot(122)
-    dm=dmap_new
+    dm=dmap_new.copy()
     plt.title(title2)
     plt.quiver(dm['v_err_loc_x'],dm['v_err_loc_y'],
-              dm['v_err_x'],dm['v_err_y'],
+              dm['v_err_x'],dm['v_err_y'], angles='xy', scale_units='xy', scale=0.02,
               color=colormap(norm(dm['v_colors'])))
     fig.colorbar(sm)
 
