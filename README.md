@@ -16,7 +16,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step1_raw_star_locate.PNG)
 
-**Step 2)** Write a module in Python to transform from world coordinates (RA/DEC) to image coordinates using the existing pinhole camera model. We use this module to take actual star locations (RA/DEC coordinates) from the star database created in step 1 as an input and output the expected precise sub-pixel location in image coordinates based on the pinhole camera model. These coordinates are referred to as “reference” coordinates.
+**Step 2)** Write a module in Python to transform from world coordinates (RA/DEC) to image coordinates. The transformation from star coordinates to camera coordinates is achieved using spherical geometry and quaternion provided by an onboard star tracker. The conversion from camera coordinates to image pixel coordinates uses an ideal pinhole camera model. We use this module to take actual star locations (RA/DEC coordinates) from the star database created in step 1 as an input and output the expected precise sub-pixel location in image coordinates based on the pinhole camera model. These coordinates are referred to as “reference” coordinates.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2a_coord_transform.PNG)
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2_ra_dec_to_pixel_coords.PNG)
