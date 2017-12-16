@@ -5,12 +5,14 @@ Polar Mesospheric Clouds (PMCs) form high up in the atmosphere near the polar me
 Soon after launch in 2007, each of the four cameras in the CIPS instrument was pointed away from the Earth and recorded high-resolution images (14 images total, 2-3 per camera) of stars for calibration purposes. While current CIPS science retrieval algorithms utilize a simplistic pin-hole camera model, the goal of this project is to improve the camera model and reduce the existing systematic errors.   
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Slide4.PNG)
 
-![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Goal_input_to_output.PNG)
 
 
 ## Approach
+**Overview:** The general approach is to input a raw star image and use an ideal camera model to produce a distortion map. This distortion map is then used to generate a 'error offset' model that can be applied to existing science data.
+![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Goal_input_to_output.PNG)
+
 **Step 1)** Identify the star ‘names’ and RA/DEC coordinates in each star image using an automated star location software AstroImageJ. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. Create a database of all stars located in the high resolution images with their associated RA/DEC coordinates.
-![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Slide9.PNG)
+![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step1_raw_star_locate.PNG)
 
 **Step 2)** Write a module in Python to transform from world coordinates (RA/DEC) to image coordinates using the existing pinhole camera model. We use this module to take actual star locations (RA/DEC coordinates) from the star database created in step 1 as an input and output the expected precise sub-pixel location in image coordinates based on the pinhole camera model. These coordinates are referred to as “reference” coordinates.
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Slide11.PNG)
