@@ -14,12 +14,11 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 **Step 1)** Identify the star ‘names’ and RA/DEC coordinates in each star image using an automated star location software AstroImageJ. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
 
-![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step1_raw_star_locate.PNG)
+![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2_ra_dec_to_pixel_coords_combined.PNG)
 
 **Step 2)** Write a module in Python to transform from world coordinates (RA/DEC) to image coordinates. The transformation from star coordinates to camera coordinates is achieved using spherical geometry and quaternion provided by an onboard star tracker. The conversion from camera coordinates to image pixel coordinates uses an ideal pinhole camera model. We use this module to take actual star locations (RA/DEC coordinates) from the star database created in step 1 as an input and output the expected precise sub-pixel location in image coordinates based on the pinhole camera model. These coordinates are referred to as “reference” coordinates.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2a_coord_transform_R1.PNG)
-![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2_ra_dec_to_pixel_coords.PNG)
 
 **Step 3)** Use a centroid algorithm to calculate the sub-pixel location of all stars in the high resolution images which will be referred to as the “distorted” coordinates. There are 2-3 high resolution images per camera (4 cameras total) and each image contains ~60-100 stars.
 
