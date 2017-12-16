@@ -5,6 +5,9 @@ Polar Mesospheric Clouds (PMCs) form high up in the atmosphere near the polar me
 Soon after launch in 2007, each of the four cameras in the CIPS instrument was pointed away from the Earth and recorded high-resolution images (14 images total, 2-3 per camera) of stars for calibration purposes. While current CIPS science retrieval algorithms utilize a simplistic pin-hole camera model, the goal of this project is to improve the camera model and reduce the existing systematic errors.   
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Slide4.PNG)
 
+![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Goal_input_to_output.PNG)
+
+
 ## Approach
 **Step 1)** Identify the star ‘names’ and RA/DEC coordinates in each star image using an automated star location software AstroImageJ. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. Create a database of all stars located in the high resolution images with their associated RA/DEC coordinates.
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Slide9.PNG)
