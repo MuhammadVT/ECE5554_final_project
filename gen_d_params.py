@@ -26,6 +26,7 @@ def gen_d_params(img,rows=1520,cols=1520):
               
     Example Usage:
         1) Create/plot error maps using stars from 'mx3' and a single linear interpolation
+            from gen_d_params import gen_d_params
             img_list=['mx1','mx2']   
             d_params_orig = gen_d_params(img_list)
             
