@@ -37,6 +37,9 @@ Due to a limited dataset (14 images total, 2-3 per camera) our approach of evalu
 
 ## Summary and Conclusions
 
+The star identification using Astrometry.net was successful in a large number of star images, however there are multiple star images that Astrometry.net was unable to identify and required manual identification. The stars requiring manual identification resulted in far less stars per image. Even with the limited dataset, we were able to identify distortion in some cameras ranging from 0.5 to greater than 1.0 pixels across the fields of view. The shape and extent of the distortion maps are seen to vary from camera to camera, and the error models built using stars from the manually identified star images seem to perform the worst.
+
+While it appears that the distortion maps are effective at reducing the overall pixel offset across the field of view, the ultimate test will be to apply these distortion maps to CIPS science images and analyze the resulting effects.
 
 
 ## References 
