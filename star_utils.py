@@ -400,16 +400,35 @@ def shrink(data, rows, cols):
 def d2pd(d_param):
     import pandas as pd
     
-    data = {k: d_param[k] for k in ('x_img', 'y_img', 'x_act','y_act','mag','xdiff','ydiff')}    
+    data = {k: d_param[k] for k in ('starname','x_img', 'y_img', 'x_act','y_act','mag','xdiff','ydiff')}    
+    col_list=[]
+    for col in data.columns:
+        if 'starname' in col:
+            col = col.split(sep='_')[0]
+            col_list.append(col)
+        else:
+            col_list.append(col)
+    data.columns=col_list
     df = pd.DataFrame(data)
     
     return df
 
-def d_all2pd(d_params,d_labels,cols=['x_img', 'y_img', 'x_act','y_act','mag','xdiff','ydiff']):
+def d_all2pd(d_params,d_labels,cols=['x_img','starname','y_img', 'x_act','y_act','mag','xdiff','ydiff']):
     import pandas as pd
+    #import pdb
     
     data=[]
     for i in range(len(d_params)):
         data.append(pd.DataFrame({k+'_'+d_labels[i]: d_params[i][k] for k in (cols)}))
-    return pd.concat(data)
+        data[i]['starname']='nada'
+        for j in range(len(data[i].index)):
+            if data[i].loc[data[i].index[j],'starname'] != np.nan:
+                data[i].loc[data[i].index[j],'starname'] = data[i].loc[data[i].index[j],'starname_'+d_labels[i]]
+        #pdb.set_trace()
+        
+    data = pd.concat(data)   
+    data = data.set_index('starname')
+    data = data.groupby(['starname']).first().reset_index()
+    data = data.set_index('starname')
+    return data
             
