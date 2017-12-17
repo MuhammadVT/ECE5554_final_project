@@ -43,6 +43,8 @@ While it appears that the distortion maps are effective at reducing the overall 
 
 
 ## References 
+1.  W.E. McClintock, D.W. Rusch, G.E. Thomas, A.W. Merkel, M.R. Lankton, V.A. Drake, S.M. Bailey, J.M. Russell, The cloud imaging and particle size experiment on the Aeronomy of Ice in the mesosphere mission: Instrument concept, design, calibration, and on-orbit performance, In Journal of Atmospheric and Solar-Terrestrial Physics, Volume 71, Issues 3â€“4, 2009, Pages 340-355, ISSN 1364-6826, https://doi.org/10.1016/j.jastp.2008.10.011.
+2.  http://www.astro.louisville.edu/software/astroimagej/
 
 
 ## Installation
