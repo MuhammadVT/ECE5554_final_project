@@ -12,11 +12,11 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Goal_input_to_output.PNG)
 
-**Step 1)** Identify the star ‘names’ and RA/DEC coordinates in each star image using an automated star location software AstroImageJ [[2](http://www.astro.louisville.edu/software/astroimagej/)]. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
+**Step 1)** Identify the star ‘names’ and star coordinates [(J2000 RA/DEC)](http://astronomy.swin.edu.au/cosmos/E/Epoch) in each star image using an automated star location software AstroImageJ [[2](http://www.astro.louisville.edu/software/astroimagej/)]. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2_ra_dec_to_pixel_coords_combined.PNG)
 
-**Step 2)** Write a module in Python to transform from world coordinates (RA/DEC) to image coordinates. The transformation from star coordinates to camera coordinates is achieved using spherical geometry and quaternion provided by an onboard star tracker. The conversion from camera coordinates to image pixel coordinates uses an ideal pinhole camera model. We use this module to take actual star locations (RA/DEC coordinates) from the star database created in step 1 as an input and output the expected precise sub-pixel location in image coordinates based on the pinhole camera model. These coordinates are referred to as “reference” coordinates.
+**Step 2)** Write a module in Python to transform from world coordinates (RA/DEC) to image coordinates. The transformation from star coordinates to camera coordinates is achieved using spherical geometry and quaternions provided by an onboard star tracker. The conversion from camera coordinates to image pixel coordinates uses an ideal pinhole camera model. We use this module to take actual star locations (RA/DEC coordinates) from the star database created in step 1 as an input and output the expected precise sub-pixel location in image coordinates based on the pinhole camera model. These coordinates are referred to as “reference” coordinates.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2a_coord_transform_R1.PNG)
 
@@ -31,6 +31,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 ## Error Modeling
 
 ### Surface Fitting
+In this approach we built three surface fitting models (Linear Interpolation, Nearest Neighbor, and a Polynomial Fitting) to predict the magnitude of pixel error offsets in each star image. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/error_mapping.ipynb)
 
 ### Regression Models
 In this approach we built three regression models (Linear Regression, Gradient Boosting Regression, and Random Forest Regression) to predict the error vectors (both magnitude and angle). The model results are then compared with a baseline model. Absolute error and squared error metrices are used to eveluate their predictions for both magnitudes and angles of the error vectors. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/build_regression_models.ipynb)
@@ -41,7 +42,7 @@ In this approach we built three regression models (Linear Regression, Gradient B
 Due to a limited dataset (14 images total, 2-3 per camera) our approach of evaluation is (1) select one image from each camera for testing purposes (2) use the remaining images to create distortion models for each camera (3) quantify the resulting error on the test images. This method will allow us to determine the efficacy of our distortion models.
 
 ### Evaluation of Regression Model
-Here we chose one of the three models to predict the error vectors and evaluation its performance by visualizing the exprected and predicted error distortion maps. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/regression_model_evaluation.ipynb)
+Here we chose one of the three models to predict the error vectors and evaluation its performance by visualizing the expected and predicted error distortion maps. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/regression_model_evaluation.ipynb)
 
 
 ### Evaluation of Surface Fitting
