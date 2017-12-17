@@ -26,7 +26,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Steps3_4_centroid_to_error_offset_R2.PNG)
 
-**Step 5)** Ultimately we would like to use the resulting discrete “pixel error offsets” found in Step 4 for each image and model the distortion in each camera. This final step will result in a camera error map that will transform every pixel location for each camera to a revised location that accounts for the distortion found in each camera.
+**Step 5)** Ultimately we would like to use the resulting discrete “pixel error offsets” found in Step 4 for each image and model the distortion in each camera. This final step will result in a camera error mapping that will transform every pixel location for each camera to a revised location that accounts for the distortion found in each camera.
 
 ## Error Modeling
 
@@ -41,15 +41,21 @@ In this approach we built three regression models (Linear Regression, Gradient B
 
 Due to a limited dataset (14 images total, 2-3 per camera) our approach of evaluation is (1) select one image from each camera for testing purposes (2) use the remaining images to create distortion models for each camera (3) quantify the resulting error on the test images. This method will allow us to determine the efficacy of our distortion models.
 
+### Evaluation of Surface Fitting
+Here we show the results of applying the surface fitting error maps to selected datasets. [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/surface_fit_evaluation.ipynb)
+
 ### Evaluation of Regression Model
 Here we chose one of the three models to predict the error vectors and evaluation its performance by visualizing the expected and predicted error distortion maps. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/regression_model_evaluation.ipynb)
 
 
-### Evaluation of Surface Fitting
+
 
 ## Summary and Conclusions
 
 The star identification using Astrometry.net was successful in a large number of star images, however there are multiple star images that Astrometry.net was unable to identify and required manual identification. The stars requiring manual identification resulted in far less stars per image. Even with the limited dataset, we were able to identify distortion in some cameras ranging from 0.5 to greater than 1.0 pixels across the fields of view. The shape and extent of the distortion maps are seen to vary from camera to camera, and the error models built using stars from the manually identified star images seem to perform the worst.
+
+The figure below illustrates the overall effect of the surface fitting error maps on the location of star centers for the 'PX' camera. The blue boxplot illustrates the spread of all error magnitudes of the original image or set of images included in the respective dataset. The green boxplots correspond to the result after linear interpolation, and the red boxplots correspond to the resulting error magnitudes after application of the nearest neighbor algorithm. 
+![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/summary_stats_surface_fit.PNG)
 
 While it appears that the distortion maps are effective at reducing the overall pixel offset across the field of view, the ultimate test will be to apply these distortion maps to CIPS science images and analyze the resulting effects.
 
