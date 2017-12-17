@@ -30,6 +30,9 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ## Error Modeling
 
+### Regression Models
+In this approach we built three regression models (Linear Regression, Gradient Boosting Regression, and Random Forest Regression) to predict the error vectors (both magnitude and angle). The model results are then compared with a baseline model. Absolute error and squared error metrices are used to eveluate their predictions for both magnitudes and angles of the error vectors. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/build_regression_models.ipynb)
+
 
 ## Model Evaluation
 
