@@ -22,7 +22,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 **Step 3)** Use a centroid algorithm to calculate the sub-pixel location of all stars in the high resolution images which will be referred to as the “distorted” coordinates. There are 2-3 high resolution images per camera (4 cameras total) and each image contains ~60-100 stars.
 
-**Step 4)** Determine the pixel offsets between the “reference” star coordinates and the “distorted” coordinates. This will result in a set of “pixel offsets” corresponding to a limited set of pixel coordinates on each image.
+**Step 4)** Determine the pixel offsets between the “reference” star coordinates and the “distorted” coordinates. This will result in a set of “pixel error offsets” corresponding to a limited set of pixel coordinates on each image.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Steps3_4_centroid_to_error_offset_R2.PNG)
 
