@@ -12,7 +12,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Goal_input_to_output.PNG)
 
-**Step 1)** Identify the star ‘names’ and star coordinates (J2000 RA/DEC)[2](http://astronomy.swin.edu.au/cosmos/E/Epoch) in each star image using an automated star location software AstroImageJ [[2](http://www.astro.louisville.edu/software/astroimagej/)]. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
+**Step 1)** Identify the star ‘names’ and star coordinates (J2000 RA/DEC) [[3]](http://astronomy.swin.edu.au/cosmos/E/Epoch) in each star image using an automated star location software AstroImageJ [[2](http://www.astro.louisville.edu/software/astroimagej/)]. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2_ra_dec_to_pixel_coords_combined.PNG)
 
