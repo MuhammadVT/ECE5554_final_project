@@ -26,7 +26,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Steps3_4_centroid_to_error_offset_R2.PNG)
 
-**Step 5)** Ultimately we would like to use the resulting discrete “pixel offsets” found in Step 4 for each image and model the distortion in each camera. This final step will result in a camera model matrix that will transform every pixel location for each camera to a revised location that accounts for the distortion found in each camera.
+**Step 5)** Ultimately we would like to use the resulting discrete “pixel error offsets” found in Step 4 for each image and model the distortion in each camera. This final step will result in a camera error map that will transform every pixel location for each camera to a revised location that accounts for the distortion found in each camera.
 
 ## Error Modeling
 
