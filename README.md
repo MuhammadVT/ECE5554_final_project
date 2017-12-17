@@ -12,7 +12,7 @@ Soon after launch in 2007, each of the four cameras in the CIPS instrument was p
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Goal_input_to_output.PNG)
 
-**Step 1)** Identify the star ‘names’ and star coordinates [(J2000 RA/DEC)](http://astronomy.swin.edu.au/cosmos/E/Epoch) in each star image using an automated star location software AstroImageJ [[2](http://www.astro.louisville.edu/software/astroimagej/)]. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
+**Step 1)** Identify the star ‘names’ and star coordinates (J2000 RA/DEC)[2](http://astronomy.swin.edu.au/cosmos/E/Epoch) in each star image using an automated star location software AstroImageJ [[2](http://www.astro.louisville.edu/software/astroimagej/)]. AstroImageJ takes an image of stars as an input and attempts to match/locate all stars in the image using a predefined star database and optimized search algorithm. A database is then generated using all of the stars located in the high resolution images with their associated RA/DEC coordinates.
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/Step2_ra_dec_to_pixel_coords_combined.PNG)
 
@@ -57,6 +57,7 @@ While it appears that the distortion maps are effective at reducing the overall 
 ## References 
 1.  W.E. McClintock, D.W. Rusch, G.E. Thomas, A.W. Merkel, M.R. Lankton, V.A. Drake, S.M. Bailey, J.M. Russell, The cloud imaging and particle size experiment on the Aeronomy of Ice in the mesosphere mission: Instrument concept, design, calibration, and on-orbit performance, In Journal of Atmospheric and Solar-Terrestrial Physics, Volume 71, Issues 3â€“4, 2009, Pages 340-355, ISSN 1364-6826, https://doi.org/10.1016/j.jastp.2008.10.011.
 2.  http://www.astro.louisville.edu/software/astroimagej/
+3.  http://astronomy.swin.edu.au/cosmos/E/Epoch
 
 
 ## Installation
