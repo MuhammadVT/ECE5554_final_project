@@ -38,6 +38,9 @@ In this approach we built three regression models (Linear Regression, Gradient B
 
 Due to a limited dataset (14 images total, 2-3 per camera) our approach of evaluation is (1) select one image from each camera for testing purposes (2) use the remaining images to create distortion models for each camera (3) quantify the resulting error on the test images. This method will allow us to determine the efficacy of our distortion models.
 
+### Evaluation of Regression Model
+Here we chose one of the three models to predict the error vectors and evaluation its performance by visualizing the exprected and predicted error distortion maps. Please see the details in [this notebook](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/regression_model_evaluation.ipynb)
+
 ## Summary and Conclusions
 
 The star identification using Astrometry.net was successful in a large number of star images, however there are multiple star images that Astrometry.net was unable to identify and required manual identification. The stars requiring manual identification resulted in far less stars per image. Even with the limited dataset, we were able to identify distortion in some cameras ranging from 0.5 to greater than 1.0 pixels across the fields of view. The shape and extent of the distortion maps are seen to vary from camera to camera, and the error models built using stars from the manually identified star images seem to perform the worst.
