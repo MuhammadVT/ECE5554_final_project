@@ -75,20 +75,21 @@ Use the Terminal or an Anaconda Prompt for the following steps.
 
 #### Create the environment from the environment.yml file:
 
-conda env create -f environment.yml
+*conda env create -f environment.yml*
 
 #### Activate the new environment:
 
-Windows: activate cv_project 
-macOS and Linux: source activate cv_project
+Windows: *activate cv_project*
+
+macOS and Linux: *source activate cv_project*
 
 #### Verify that the new environment was installed correctly:
 
-conda list
+*conda list*
 
 #### Run the Jupyter Notebook
 
-jupyter notebook
+*jupyter notebook*
 
 
 
