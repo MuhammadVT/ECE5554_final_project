@@ -54,11 +54,11 @@ Here we chose one of the three models to predict the error vectors and evaluatio
 
 The star identification using Astrometry.net was successful in a large number of star images, however there are multiple star images that Astrometry.net was unable to identify and required manual identification. The stars requiring manual identification resulted in far less stars per image. Even with the limited dataset, we were able to identify distortion in some cameras ranging from 0.5 to greater than 1.0 pixels across the fields of view. The shape and extent of the distortion maps are seen to vary from camera to camera, and the error models built using stars from the manually identified star images seem to perform the worst.
 
-The figure below illustrates the overall effect of the surface fitting error maps on the location of star centers for the 'PX' camera. The blue boxplot illustrates the spread of all error magnitudes of the original image or set of images included in the respective dataset. The green boxplots correspond to the result after linear interpolation, and the red boxplots correspond to the resulting error magnitudes after application of the nearest neighbor algorithm. 
+The figure below illustrates the overall effectiveness of the surface fitting error maps of decreasing the pixel error offset of star centroids for the 'PX' camera. The blue boxplot illustrates the spread of all error magnitudes of the original image or set of images included in the respective dataset. The green boxplots correspond to the result after linear interpolation, and the red boxplots correspond to the resulting error magnitudes after application of the nearest neighbor algorithm. 
 
 ![](https://github.com/MuhammadVT/ECE5554_final_project/blob/master/CIPS_presentation_final_blank_background/summary_stats_surface_fit.PNG)
 
-While it appears that the distortion maps are effective at reducing the overall pixel offset across the field of view, the ultimate test will be to apply these distortion maps to CIPS science images and analyze the resulting effects.
+Further analysis of the star centroid algorithm remains, and future work will entail quantifying the magnitude of uncertainty in star centroid calculations. While it appears that the distortion maps are effective at reducing the overall pixel offset across the field of view, the ultimate test will be to apply these distortion maps to CIPS science images and analyze the resulting effects. 
 
 
 ## References 
